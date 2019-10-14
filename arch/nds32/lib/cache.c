@@ -1,13 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2012 Andes Technology Corporation
  * Shawn Lin, Andes Technology Corporation <nobuhiro@andestech.com>
  * Macpaul Lin, Andes Technology Corporation <macpaul@andestech.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
-#if (!defined(CONFIG_SYS_ICACHE_OFF) || !defined(CONFIG_SYS_DCACHE_OFF))
+#if !(CONFIG_IS_ENABLED(SYS_ICACHE_OFF) && CONFIG_IS_ENABLED(SYS_DCACHE_OFF))
 static inline unsigned long CACHE_SET(unsigned char cache)
 {
 	if (cache == ICACHE)
@@ -39,7 +38,7 @@ static inline unsigned long CACHE_LINE_SIZE(enum cache_t cache)
 }
 #endif
 
-#ifndef CONFIG_SYS_ICACHE_OFF
+#if !CONFIG_IS_ENABLED(SYS_ICACHE_OFF)
 void invalidate_icache_all(void)
 {
 	unsigned long end, line_size;
@@ -134,7 +133,7 @@ int icache_status(void)
 
 #endif
 
-#ifndef CONFIG_SYS_DCACHE_OFF
+#if !CONFIG_IS_ENABLED(SYS_DCACHE_OFF)
 void dcache_wbinval_all(void)
 {
 	unsigned long end, line_size;

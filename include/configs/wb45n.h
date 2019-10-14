@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Configuation settings for the WB45N CPU Module.
- *
- * SPDX-License-Identifier: GPL-2.0+
  */
 
 #ifndef __CONFIG_H__
@@ -33,7 +32,6 @@
 #define CONFIG_BOOTP_BOOTFILESIZE
 
 /* SDRAM */
-#define CONFIG_NR_DRAM_BANKS        1
 #define CONFIG_SYS_SDRAM_BASE       0x20000000
 #define CONFIG_SYS_SDRAM_SIZE       0x04000000	/* 64 MB */
 
@@ -41,7 +39,6 @@
     (CONFIG_SYS_SDRAM_BASE + 4 * 1024 - GENERATED_GBL_DATA_SIZE)
 
 /* NAND flash */
-#define CONFIG_NAND_ATMEL
 #define CONFIG_SYS_MAX_NAND_DEVICE  1
 #define CONFIG_SYS_NAND_BASE        0x40000000
 /* our ALE is AD21 */
@@ -51,15 +48,6 @@
 #define CONFIG_SYS_NAND_ENABLE_PIN  AT91_PIN_PD4
 #define CONFIG_SYS_NAND_READY_PIN   AT91_PIN_PD5
 
-/* PMECC & PMERRLOC */
-#define CONFIG_ATMEL_NAND_HWECC     1
-#define CONFIG_ATMEL_NAND_HW_PMECC  1
-#define CONFIG_PMECC_CAP            4
-#define CONFIG_PMECC_SECTOR_SIZE    512
-
-#define CONFIG_MTD_DEVICE
-#define CONFIG_CMD_MTDPARTS
-#define CONFIG_MTD_PARTITIONS
 #define CONFIG_RBTREE
 #define CONFIG_LZO
 
@@ -122,7 +110,6 @@
 #define CONFIG_SYS_MALLOC_LEN       (512 * 1024 + 0x1000)
 
 /* SPL */
-#define CONFIG_SPL_TEXT_BASE        0x300000
 #define CONFIG_SPL_MAX_SIZE         0x6000
 #define CONFIG_SPL_STACK            0x308000
 
@@ -147,6 +134,5 @@
 #define CONFIG_SYS_NAND_OOBSIZE     64
 #define CONFIG_SYS_NAND_BLOCK_SIZE  0x20000
 #define CONFIG_SYS_NAND_BAD_BLOCK_POS   0x0
-#define CONFIG_SPL_GENERATE_ATMEL_PMECC_HEADER
 
 #endif				/* __CONFIG_H__ */

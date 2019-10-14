@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2000, 2001
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -60,6 +59,10 @@
 #endif
 #endif
 
+#if defined(CONFIG_DM_I2C)
+int eeprom_i2c_bus;
+#endif
+
 __weak int eeprom_write_enable(unsigned dev_addr, int state)
 {
 	return 0;
@@ -67,13 +70,10 @@ __weak int eeprom_write_enable(unsigned dev_addr, int state)
 
 void eeprom_init(int bus)
 {
-	/* SPI EEPROM */
-#if defined(CONFIG_SPI) && !defined(CONFIG_ENV_EEPROM_IS_ON_I2C)
-	spi_init_f();
-#endif
-
 	/* I2C EEPROM */
-#if defined(CONFIG_SYS_I2C)
+#if defined(CONFIG_DM_I2C)
+	eeprom_i2c_bus = bus;
+#elif defined(CONFIG_SYS_I2C)
 	if (bus >= 0)
 		i2c_set_bus_num(bus);
 	i2c_init(CONFIG_SYS_I2C_SPEED, CONFIG_SYS_I2C_SLAVE);
@@ -108,7 +108,7 @@ static int eeprom_len(unsigned offset, unsigned end)
 
 	/*
 	 * For a FRAM device there is no limit on the number of the
-	 * bytes that can be ccessed with the single read or write
+	 * bytes that can be accessed with the single read or write
 	 * operation.
 	 */
 #if !defined(CONFIG_SYS_I2C_FRAM)
@@ -130,26 +130,32 @@ static int eeprom_rw_block(unsigned offset, uchar *addr, unsigned alen,
 {
 	int ret = 0;
 
-	/* SPI */
-#if defined(CONFIG_SPI) && !defined(CONFIG_ENV_EEPROM_IS_ON_I2C)
-	if (read)
-		spi_read(addr, alen, buffer, len);
-	else
-		spi_write(addr, alen, buffer, len);
-#else	/* I2C */
+#if defined(CONFIG_DM_I2C)
+	struct udevice *dev;
 
-#if defined(CONFIG_SYS_I2C_EEPROM_BUS)
-	i2c_set_bus_num(CONFIG_SYS_I2C_EEPROM_BUS);
-#endif
+	ret = i2c_get_chip_for_busnum(eeprom_i2c_bus, addr[0],
+				      alen - 1, &dev);
+	if (ret) {
+		printf("%s: Cannot find udev for a bus %d\n", __func__,
+		       eeprom_i2c_bus);
+		return CMD_RET_FAILURE;
+	}
+
+	if (read)
+		ret = dm_i2c_read(dev, offset, buffer, len);
+	else
+		ret = dm_i2c_write(dev, offset, buffer, len);
+
+#else /* Non DM I2C support - will be removed */
 
 	if (read)
 		ret = i2c_read(addr[0], offset, alen - 1, buffer, len);
 	else
 		ret = i2c_write(addr[0], offset, alen - 1, buffer, len);
-
+#endif /* CONFIG_DM_I2C */
 	if (ret)
-		ret = 1;
-#endif
+		ret = CMD_RET_FAILURE;
+
 	return ret;
 }
 
@@ -160,6 +166,10 @@ static int eeprom_rw(unsigned dev_addr, unsigned offset, uchar *buffer,
 	unsigned alen, len;
 	int rcode = 0;
 	uchar addr[3];
+
+#if defined(CONFIG_SYS_I2C_EEPROM_BUS)
+	eeprom_init(CONFIG_SYS_I2C_EEPROM_BUS);
+#endif
 
 	while (offset < end) {
 		alen = eeprom_addr(dev_addr, offset, addr);

@@ -1,15 +1,13 @@
-#
+# SPDX-License-Identifier: GPL-2.0+
 # Copyright (c) 2017 Google, Inc
 # Written by Simon Glass <sjg@chromium.org>
-#
-# SPDX-License-Identifier:      GPL-2.0+
 #
 # Test for the image module
 
 import unittest
 
 from image import Image
-from elf_test import capture_sys_output
+from test_util import capture_sys_output
 
 class TestImage(unittest.TestCase):
     def testInvalidFormat(self):

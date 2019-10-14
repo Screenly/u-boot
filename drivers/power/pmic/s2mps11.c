@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  *  Copyright (C) 2015 Samsung Electronics
  *  Przemyslaw Marczak  <p.marczak@samsung.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -12,8 +11,6 @@
 #include <i2c.h>
 #include <power/pmic.h>
 #include <power/s2mps11.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 static const struct pmic_child_info pmic_children_info[] = {
 	{ .prefix = S2MPS11_OF_LDO_PREFIX, .driver = S2MPS11_LDO_DRIVER },
@@ -33,7 +30,7 @@ static int s2mps11_write(struct udevice *dev, uint reg, const uint8_t *buff,
 
 	ret = dm_i2c_write(dev, reg, buff, len);
 	if (ret)
-		pr_err("write error to device: %p register: %#x!", dev, reg);
+		pr_err("write error to device: %p register: %#x!\n", dev, reg);
 
 	return ret;
 }
@@ -44,7 +41,7 @@ static int s2mps11_read(struct udevice *dev, uint reg, uint8_t *buff, int len)
 
 	ret = dm_i2c_read(dev, reg, buff, len);
 	if (ret)
-		pr_err("read error from device: %p register: %#x!", dev, reg);
+		pr_err("read error from device: %p register: %#x!\n", dev, reg);
 
 	return ret;
 }
@@ -56,8 +53,8 @@ static int s2mps11_probe(struct udevice *dev)
 
 	regulators_node = dev_read_subnode(dev, "voltage-regulators");
 	if (!ofnode_valid(regulators_node)) {
-		debug("%s: %s regulators subnode not found!", __func__,
-							     dev->name);
+		debug("%s: %s regulators subnode not found!\n", __func__,
+		      dev->name);
 		return -ENXIO;
 	}
 

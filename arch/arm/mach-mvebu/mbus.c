@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Address map functions for Marvell EBU SoCs (Kirkwood, Armada
  * 370/XP, Dove, Orion5x and MV78xx0)
@@ -10,8 +11,6 @@
  *
  * based on mbus driver from Linux
  *   (C) Copyright 2008 Marvell Semiconductor
- *
- * SPDX-License-Identifier:	GPL-2.0
  *
  * The Marvell EBU SoCs have a configurable physical address space:
  * the physical address at which certain devices (PCIe, NOR, NAND,
@@ -345,6 +344,11 @@ static void mvebu_mbus_default_setup_cpu_target(struct mvebu_mbus_state *mbus)
 		}
 	}
 	mbus_dram_info.num_cs = cs;
+
+#if defined(CONFIG_ARMADA_MSYS)
+	/* Disable MBUS Err Prop - in order to avoid data aborts */
+	clrbits_le32(mbus->mbuswins_base + 0x200, BIT(8));
+#endif
 }
 
 static const struct mvebu_mbus_soc_data
@@ -406,6 +410,7 @@ int mvebu_mbus_del_window(phys_addr_t base, size_t size)
 	return 0;
 }
 
+#ifndef CONFIG_KIRKWOOD
 static void mvebu_mbus_get_lowest_base(struct mvebu_mbus_state *mbus,
 				       phys_addr_t *base)
 {
@@ -452,6 +457,7 @@ static void mvebu_config_mbus_bridge(struct mvebu_mbus_state *mbus)
 	val = (size / (64 << 10)) - 1;
 	writel((val << 16) | 0x1, MBUS_BRIDGE_WIN_CTRL_REG);
 }
+#endif
 
 int mbus_dt_setup_win(struct mvebu_mbus_state *mbus,
 		      u32 base, u32 size, u8 target, u8 attr)
@@ -472,12 +478,14 @@ int mbus_dt_setup_win(struct mvebu_mbus_state *mbus,
 			return -ENOMEM;
 	}
 
+#ifndef CONFIG_KIRKWOOD
 	/*
 	 * Re-configure the mbus bridge registers each time this function
 	 * is called. Since it may get called from the board code in
 	 * later boot stages as well.
 	 */
 	mvebu_config_mbus_bridge(mbus);
+#endif
 
 	return 0;
 }

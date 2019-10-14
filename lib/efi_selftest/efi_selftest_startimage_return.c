@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * efi_selftest_start_image
  *
  * Copyright (c) 2018 Heinrich Schuchardt <xypron.glpk@gmx.de>
- *
- * SPDX-License-Identifier:     GPL-2.0+
  *
  * This test checks the StartImage boot service.
  * The efi_selftest_miniapp_return.efi application is loaded into memory
@@ -104,7 +103,7 @@ static int teardown(void)
 	efi_status_t r = EFI_ST_SUCCESS;
 
 	if (image) {
-		r = efi_free_pool(image);
+		r = boottime->free_pool(image);
 		if (r != EFI_SUCCESS) {
 			efi_st_error("Failed to free image\n");
 			return EFI_ST_FAILURE;

@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Copyright 2013-2015 Toradex, Inc.
+ * Copyright 2013-2019 Toradex, Inc.
  *
  * Configuration settings for the Toradex Colibri iMX6
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -12,9 +11,6 @@
 #include "mx6_common.h"
 
 #undef CONFIG_DISPLAY_BOARDINFO
-#define CONFIG_DISPLAY_BOARDINFO_LATE	/* Calls show_board_info() */
-
-#define CONFIG_SYS_GENERIC_BOARD
 
 #include <asm/arch/imx-regs.h>
 #include <asm/mach-imx/gpio.h>
@@ -32,46 +28,27 @@
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(32 * 1024 * 1024)
 
-#define CONFIG_MISC_INIT_R
-
 #define CONFIG_MXC_UART
 #define CONFIG_MXC_UART_BASE		UART1_BASE
 
-/* Make the HW version stuff available in U-Boot env */
-#define CONFIG_VERSION_VARIABLE		/* ver environment variable */
-#define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-
 /* I2C Configs */
-#define CONFIG_SYS_I2C
 #define CONFIG_SYS_I2C_MXC
-#define CONFIG_SYS_I2C_MXC_I2C1         /* enable I2C bus 1 */
-#define CONFIG_SYS_I2C_MXC_I2C2         /* enable I2C bus 2 */
-#define CONFIG_SYS_I2C_MXC_I2C3         /* enable I2C bus 3 */
+#define CONFIG_SYS_I2C_MXC_I2C1		/* enable I2C bus 1 */
+#define CONFIG_SYS_I2C_MXC_I2C2		/* enable I2C bus 2 */
+#define CONFIG_SYS_I2C_MXC_I2C3		/* enable I2C bus 3 */
 #define CONFIG_SYS_I2C_SPEED		100000
-
-/* OCOTP Configs */
-#ifdef CONFIG_CMD_FUSE
-#define CONFIG_MXC_OCOTP
-#endif
+#define CONFIG_SYS_MXC_I2C3_SPEED	400000
 
 /* MMC Configs */
-#define CONFIG_FSL_ESDHC
-#define CONFIG_FSL_USDHC
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 
-#define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
-#define CONFIG_BOUNCE_BUFFER
-
 /* Network */
 #define CONFIG_FEC_MXC
-#define CONFIG_MII
 #define IMX_FEC_BASE			ENET_BASE_ADDR
 #define CONFIG_FEC_XCV_TYPE		RMII
 #define CONFIG_ETHPRIME			"FEC"
 #define CONFIG_FEC_MXC_PHYADDR		1
-#define CONFIG_IP_DEFRAG
-#define CONFIG_TFTP_BLOCKSIZE		16352
 #define CONFIG_TFTP_TSIZE
 
 /* USB Configs */
@@ -83,15 +60,7 @@
 /* Client */
 #define CONFIG_USBD_HS
 
-#define CONFIG_USB_GADGET_MASS_STORAGE
-/* USB DFU */
-#define CONFIG_DFU_MMC
-
-/* Miscellaneous commands */
-
 /* Framebuffer and LCD */
-#define CONFIG_VIDEO_IPUV3
-#define CONFIG_SYS_CONSOLE_IS_IN_ENV
 #define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE
 #define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_SPLASH_SCREEN
@@ -105,7 +74,6 @@
 
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
-#define CONFIG_CONS_INDEX		1
 
 /* Command definition */
 #undef CONFIG_CMD_LOADB
@@ -121,41 +89,54 @@
 
 #define CONFIG_LOADADDR			0x12000000
 
-#ifdef CONFIG_CMD_MMC
-#define CONFIG_DRIVE_MMC "mmc "
-#else
-#define CONFIG_DRIVE_MMC
-#endif
-
-#define CONFIG_DRIVE_TYPES CONFIG_DRIVE_MMC
+#ifndef CONFIG_SPL_BUILD
+#define BOOT_TARGET_DEVICES(func) \
+	func(MMC, mmc, 0) \
+	func(MMC, mmc, 1) \
+	func(USB, usb, 0) \
+	func(DHCP, dhcp, na)
+#include <config_distro_bootcmd.h>
+#undef BOOTENV_RUN_NET_USB_START
+#define BOOTENV_RUN_NET_USB_START ""
+#else /* CONFIG_SPL_BUILD */
+#define BOOTENV
+#endif /* CONFIG_SPL_BUILD */
 
 #define DFU_ALT_EMMC_INFO \
 	"u-boot.imx raw 0x2 0x3ff mmcpart 0;" \
 	"boot part 0 1;" \
 	"rootfs part 0 2;" \
-	"uImage fat 0 1;" \
-	"imx6q-colibri-eval-v3.dtb fat 0 1;" \
-	"imx6q-colibri-cam-eval-v3.dtb fat 0 1"
+	"zImage fat 0 1;" \
+	"imx6dl-colibri-eval-v3.dtb fat 0 1;" \
+	"imx6dl-colibri-cam-eval-v3.dtb fat 0 1"
 
 #define EMMC_BOOTCMD \
-	"emmcargs=ip=off root=/dev/mmcblk0p2 rw,noatime rootfstype=ext3 " \
+	"set_emmcargs=setenv emmcargs ip=off root=PARTUUID=${uuid} "\
+		"rw,noatime rootfstype=ext4 " \
 		"rootwait\0" \
-	"emmcboot=run setup; " \
+	"emmcboot=run setup; run emmcfinduuid; run set_emmcargs; " \
 		"setenv bootargs ${defargs} ${emmcargs} ${setupargs} " \
 		"${vidargs}; echo Booting from internal eMMC chip...; "	\
-		"run emmcdtbload; load mmc 0:1 ${kernel_addr_r} " \
-		"${boot_file} && run fdt_fixup && " \
-		"bootm ${kernel_addr_r} ${dtbparam}\0" \
-	"emmcdtbload=setenv dtbparam; load mmc 0:1 ${fdt_addr_r} " \
-		"${fdt_file} && setenv dtbparam \" - ${fdt_addr_r}\" && true\0"
+		"run emmcdtbload; load mmc ${emmcdev}:${emmcbootpart} " \
+		"${kernel_addr_r} ${boot_file} && run fdt_fixup && " \
+		"bootz ${kernel_addr_r} ${dtbparam}\0" \
+	"emmcbootpart=1\0" \
+	"emmcdev=0\0" \
+	"emmcdtbload=setenv dtbparam; load mmc ${emmcdev}:${emmcbootpart} " \
+		"${fdt_addr_r} ${fdt_file} && " \
+		"setenv dtbparam \" - ${fdt_addr_r}\" && true\0" \
+	"emmcfinduuid=part uuid mmc ${mmcdev}:${emmcrootpart} uuid\0" \
+	"emmcrootpart=2\0"
 
 #define MEM_LAYOUT_ENV_SETTINGS \
 	"bootm_size=0x10000000\0" \
-	"fdt_addr_r=0x12000000\0" \
+	"fdt_addr_r=0x12100000\0" \
 	"fdt_high=0xffffffff\0" \
 	"initrd_high=0xffffffff\0" \
 	"kernel_addr_r=0x11000000\0" \
-	"ramdisk_addr_r=0x12100000\0"
+	"pxefile_addr_r=0x17100000\0" \
+	"ramdisk_addr_r=0x12200000\0" \
+	"scriptaddr=0x17000000\0"
 
 #define NFS_BOOTCMD \
 	"nfsargs=ip=:::::eth0:on root=/dev/nfs rw\0" \
@@ -163,40 +144,34 @@
 		"setenv bootargs ${defargs} ${nfsargs} ${setupargs} " \
 		"${vidargs}; echo Booting via DHCP/TFTP/NFS...; " \
 		"run nfsdtbload; dhcp ${kernel_addr_r} " \
-		"&& run fdt_fixup && bootm ${kernel_addr_r} ${dtbparam}\0" \
+		"&& run fdt_fixup && bootz ${kernel_addr_r} ${dtbparam}\0" \
 	"nfsdtbload=setenv dtbparam; tftp ${fdt_addr_r} ${fdt_file} " \
 		"&& setenv dtbparam \" - ${fdt_addr_r}\" && true\0"
 
-#define SD_BOOTCMD						\
-	"sdargs=ip=off root=/dev/mmcblk1p2 rw,noatime rootfstype=ext3 " \
-		"rootwait\0" \
-	"sdboot=run setup; " \
+#define SD_BOOTCMD \
+	"set_sdargs=setenv sdargs ip=off root=PARTUUID=${uuid} rw,noatime " \
+		"rootfstype=ext4 rootwait\0" \
+	"sdboot=run setup; run sdfinduuid; run set_sdargs; " \
 		"setenv bootargs ${defargs} ${sdargs} ${setupargs} " \
 		"${vidargs}; echo Booting from SD card; " \
-		"run sddtbload; load mmc 1:1 ${kernel_addr_r} " \
-		"${boot_file} && run fdt_fixup && " \
-		"bootm ${kernel_addr_r} ${dtbparam}\0" \
-	"sddtbload=setenv dtbparam; load mmc 1:1 ${fdt_addr_r} " \
-		"${fdt_file} && setenv dtbparam \" - ${fdt_addr_r}\" && true\0"
-
-#define USB_BOOTCMD \
-	"usbargs=ip=off root=/dev/sda2 rw,noatime rootfstype=ext3 " \
-		"rootwait\0" \
-	"usbboot=run setup; setenv bootargs ${defargs} ${setupargs} " \
-		"${usbargs} ${vidargs}; echo Booting from USB stick...; " \
-		"usb start && run usbdtbload; load usb 0:1 ${kernel_addr_r} " \
-		"${boot_file} && run fdt_fixup && " \
-		"bootm ${kernel_addr_r} ${dtbparam}\0" \
-	"usbdtbload=setenv dtbparam; load usb 0:1 ${fdt_addr_r} " \
-		"${fdt_file} && setenv dtbparam \" - ${fdt_addr_r}\" && true\0"
+		"run sddtbload; load mmc ${sddev}:${sdbootpart} "\
+		"${kernel_addr_r} ${boot_file} && run fdt_fixup && " \
+		"bootz ${kernel_addr_r} ${dtbparam}\0" \
+	"sdbootpart=1\0" \
+	"sddev=1\0" \
+	"sddtbload=setenv dtbparam; load mmc ${sddev}:${sdbootpart} " \
+		"${fdt_addr_r} ${fdt_file} && setenv dtbparam \" - " \
+		"${fdt_addr_r}\" && true\0" \
+	"sdfinduuid=part uuid mmc ${sddev}:${sdrootpart} uuid\0" \
+	"sdrootpart=2\0"
 
 #define FDT_FILE "imx6dl-colibri-eval-v3.dtb"
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"bootcmd=run emmcboot ; echo ; echo emmcboot failed ; " \
-		"run nfsboot ; echo ; echo nfsboot failed ; " \
-		"usb start ;" \
+	BOOTENV \
+	"bootcmd=setenv fdtfile ${fdt_file}; run distro_bootcmd; " \
+		"usb start ; " \
 		"setenv stdout serial,vga ; setenv stdin serial,usbkbd\0" \
-	"boot_file=uImage\0" \
+	"boot_file=zImage\0" \
 	"console=ttymxc0\0" \
 	"defargs=enable_wait_mode=off galcore.contiguousSize=50331648\0" \
 	"dfu_alt_info=" DFU_ALT_EMMC_INFO "\0" \
@@ -220,6 +195,7 @@
 		"load ${interface} ${drive}:1 ${loadaddr} flash_blk.img && " \
 		"source ${loadaddr}\0" \
 	"splashpos=m,m\0" \
+	"splashimage=" __stringify(CONFIG_LOADADDR) "\0" \
 	"vidargs=video=mxcfb0:dev=lcd,640x480M@60,if=RGB666 " \
 		"video=mxcfb1:off fbmem=8M\0 "
 
@@ -229,7 +205,6 @@
 #undef CONFIG_SYS_MAXARGS
 #define CONFIG_SYS_MAXARGS		48
 
-#define CONFIG_SYS_ALT_MEMTEST
 #define CONFIG_SYS_MEMTEST_START	0x10000000
 #define CONFIG_SYS_MEMTEST_END		0x10010000
 #define CONFIG_SYS_MEMTEST_SCRATCH	0x10800000
@@ -237,7 +212,6 @@
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
 
 /* Physical Memory Map */
-#define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
 
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
@@ -259,8 +233,6 @@
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #define CONFIG_SYS_MMC_ENV_PART		1
 #endif
-
-#define CONFIG_OF_SYSTEM_SETUP
 
 #define CONFIG_CMD_TIME
 

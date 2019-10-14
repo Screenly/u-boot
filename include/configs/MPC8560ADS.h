@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright 2004, 2011 Freescale Semiconductor.
  * (C) Copyright 2002,2003 Motorola,Inc.
  * Xianghua Xiao <X.Xiao@motorola.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -28,7 +27,6 @@
 
 #define CONFIG_PCI_INDIRECT_BRIDGE
 #define CONFIG_SYS_PCI_64BIT	1	/* enable 64-bit PCI resources */
-#define CONFIG_TSEC_ENET		/* tsec ethernet support */
 #undef CONFIG_ETHER_ON_FCC             /* cpm FCC ethernet support */
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_RESET_PHY_R	1	/* Call reset_phy() */
@@ -68,7 +66,6 @@
 /* DDR Setup */
 #define CONFIG_SPD_EEPROM		/* Use SPD EEPROM for DDR setup*/
 #define CONFIG_DDR_SPD
-#undef CONFIG_FSL_DDR_INTERACTIVE
 
 #define CONFIG_MEM_INIT_VALUE		0xDeadBeef
 
@@ -115,8 +112,6 @@
 #undef  CONFIG_SYS_RAMBOOT
 #endif
 
-#define CONFIG_FLASH_CFI_DRIVER
-#define CONFIG_SYS_FLASH_CFI
 #define CONFIG_SYS_FLASH_EMPTY_INFO
 
 #undef CONFIG_CLOCKS_IN_MHZ
@@ -205,7 +200,6 @@
 /* Serial Port */
 #define CONFIG_CONS_ON_SCC	/* define if console on SCC */
 #undef  CONFIG_CONS_NONE	/* define if console on something else */
-#define CONFIG_CONS_INDEX       1  /* which serial channel for console */
 
 #define CONFIG_SYS_BAUDRATE_TABLE  \
 	{300, 600, 1200, 2400, 4800, 9600, 19200, 38400,115200}
@@ -256,9 +250,6 @@
 
 #ifdef CONFIG_TSEC_ENET
 
-#ifndef CONFIG_MII
-#define CONFIG_MII		1	/* MII PHY management */
-#endif
 #define CONFIG_TSEC1	1
 #define CONFIG_TSEC1_NAME	"TSEC0"
 #define CONFIG_TSEC2	1
@@ -296,10 +287,6 @@
   /* need more definitions here for FE3 */
   #define FETH3_RST		0x80
 #endif					/* CONFIG_ETHER_INDEX */
-
-#ifndef CONFIG_MII
-#define CONFIG_MII		1	/* MII PHY management */
-#endif
 
 #define CONFIG_BITBANGMII		/* bit-bang MII PHY management */
 
@@ -378,7 +365,7 @@
 
 #define CONFIG_IPADDR    192.168.1.253
 
-#define CONFIG_HOSTNAME		unknown
+#define CONFIG_HOSTNAME		"unknown"
 #define CONFIG_ROOTPATH		"/nfsroot"
 #define CONFIG_BOOTFILE		"your.uImage"
 

@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2014
  * NVIDIA Corporation <www.nvidia.com>
- *
- * SPDX-License-Identifier:     GPL-2.0+
  */
 
 #include <common.h>
@@ -122,7 +121,7 @@ static void enable_required_clocks(void)
 int nvidia_board_init(void)
 {
 	clock_start_periph_pll(PERIPH_ID_EXTPERIPH1, CLOCK_ID_OSC, 12000000);
-	clock_start_periph_pll(PERIPH_ID_I2S1, CLOCK_ID_OSC, 1500000);
+	clock_start_periph_pll(PERIPH_ID_I2S1, CLOCK_ID_CLK_M, 1500000);
 
 	/* For external MAX98090 audio codec */
 	clock_external_output(1);

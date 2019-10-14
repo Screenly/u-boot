@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (c) 2011, Google Inc. All rights reserved.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 
@@ -100,6 +99,13 @@ ulong bootstage_add_record(enum bootstage_id id, const char *name,
 	struct bootstage_data *data = gd->bootstage;
 	struct bootstage_record *rec;
 
+	/*
+	 * initf_bootstage() is called very early during boot but since hang()
+	 * calls bootstage_error() we can be called before bootstage is set up.
+	 * Add a check to avoid this.
+	 */
+	if (!data)
+		return mark;
 	if (flags & BOOTSTAGEF_ALLOC)
 		id = data->next_id++;
 

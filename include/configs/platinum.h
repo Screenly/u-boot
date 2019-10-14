@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2014, Barco (www.barco.com)
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __PLATINUM_CONFIG_H__
@@ -37,7 +36,6 @@
 
 /* Ethernet config */
 #define CONFIG_FEC_MXC
-#define CONFIG_MII
 #define IMX_FEC_BASE				ENET_BASE_ADDR
 
 /* USB config */
@@ -46,7 +44,6 @@
 #define CONFIG_MXC_USB_FLAGS			0
 
 /* Memory config */
-#define CONFIG_NR_DRAM_BANKS			1
 #define PHYS_SDRAM				MMDC0_ARB_BASE_ADDR
 #ifndef PHYS_SDRAM_SIZE
 #define PHYS_SDRAM_SIZE				(1024 << 20)
@@ -97,7 +94,6 @@
  */
 
 /* Board startup config */
-#define CONFIG_MISC_INIT_R
 
 #define CONFIG_SYS_MEMTEST_START		PHYS_SDRAM
 #define CONFIG_SYS_MEMTEST_END			(CONFIG_SYS_MEMTEST_START + \
@@ -106,11 +102,8 @@
 #define CONFIG_BOOTCOMMAND			"run bootubi_scr"
 
 /* Miscellaneous configurable options */
-#define CONFIG_PREBOOT
 
 /* MTD/UBI/UBIFS config */
-#define CONFIG_MTD_DEVICE
-#define CONFIG_MTD_PARTITIONS
 
 /*
  * Environment configuration

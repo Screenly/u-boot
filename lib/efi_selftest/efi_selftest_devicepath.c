@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * efi_selftest_devicepath
  *
  * Copyright (c) 2017 Heinrich Schuchardt <xypron.glpk@gmx.de>
- *
- * SPDX-License-Identifier:     GPL-2.0+
  *
  * This unit test checks the following protocol services:
  * DevicePathToText
@@ -21,7 +20,7 @@ struct interface {
 	void (EFIAPI * inc)(void);
 } interface;
 
-static efi_guid_t guid_device_path = DEVICE_PATH_GUID;
+static efi_guid_t guid_device_path = EFI_DEVICE_PATH_PROTOCOL_GUID;
 
 static efi_guid_t guid_device_path_to_text_protocol =
 	EFI_DEVICE_PATH_TO_TEXT_PROTOCOL_GUID;
@@ -52,7 +51,7 @@ struct efi_device_path_to_text_protocol *device_path_to_text;
  * Setup unit test.
  *
  * Create three handles. Install a new protocol on two of them and
- * provice device paths.
+ * provide device paths.
  *
  * handle1
  *   guid interface
@@ -258,7 +257,7 @@ static int teardown(void)
 static int execute(void)
 {
 	struct efi_device_path *remaining_dp;
-	void *handle;
+	efi_handle_t handle;
 	/*
 	 * This device path node ends with the letter 't' of 'u-boot'.
 	 * The following '.bin' does not belong to the node but is

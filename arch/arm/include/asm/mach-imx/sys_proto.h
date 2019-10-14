@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2009
  * Stefano Babic, DENX Software Engineering, sbabic@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _SYS_PROTO_H_
@@ -27,7 +26,8 @@
 
 #define is_mx6() (is_soc_type(MXC_SOC_MX6))
 #define is_mx7() (is_soc_type(MXC_SOC_MX7))
-#define is_mx8m() (is_soc_type(MXC_SOC_MX8M))
+#define is_imx8m() (is_soc_type(MXC_SOC_IMX8M))
+#define is_imx8() (is_soc_type(MXC_SOC_IMX8))
 
 #define is_mx6dqp() (is_cpu_type(MXC_CPU_MX6QP) || is_cpu_type(MXC_CPU_MX6DP))
 #define is_mx6dq() (is_cpu_type(MXC_CPU_MX6Q) || is_cpu_type(MXC_CPU_MX6D))
@@ -38,9 +38,22 @@
 #define is_mx6solo() (is_cpu_type(MXC_CPU_MX6SOLO))
 #define is_mx6ul() (is_cpu_type(MXC_CPU_MX6UL))
 #define is_mx6ull() (is_cpu_type(MXC_CPU_MX6ULL))
+#define is_mx6ulz() (is_cpu_type(MXC_CPU_MX6ULZ))
 #define is_mx6sll() (is_cpu_type(MXC_CPU_MX6SLL))
 
 #define is_mx7ulp() (is_cpu_type(MXC_CPU_MX7ULP))
+
+#define is_imx8mq() (is_cpu_type(MXC_CPU_IMX8MQ))
+#define is_imx8qm() (is_cpu_type(MXC_CPU_IMX8QM))
+#define is_imx8mm() (is_cpu_type(MXC_CPU_IMX8MM) || is_cpu_type(MXC_CPU_IMX8MML) ||\
+	is_cpu_type(MXC_CPU_IMX8MMD) || is_cpu_type(MXC_CPU_IMX8MMDL) || \
+	is_cpu_type(MXC_CPU_IMX8MMS) || is_cpu_type(MXC_CPU_IMX8MMSL))
+#define is_imx8mml() (is_cpu_type(MXC_CPU_IMX8MML))
+#define is_imx8mmd() (is_cpu_type(MXC_CPU_IMX8MMD))
+#define is_imx8mmdl() (is_cpu_type(MXC_CPU_IMX8MMDL))
+#define is_imx8mms() (is_cpu_type(MXC_CPU_IMX8MMS))
+#define is_imx8mmsl() (is_cpu_type(MXC_CPU_IMX8MMSL))
+#define is_imx8qxp() (is_cpu_type(MXC_CPU_IMX8QXP))
 
 #ifdef CONFIG_MX6
 #define IMX6_SRC_GPR10_BMODE		BIT(28)
@@ -64,8 +77,8 @@ enum imx6_bmode_serial_rom {
 };
 
 enum imx6_bmode_emi {
-	IMX6_BMODE_ONENAND,
 	IMX6_BMODE_NOR,
+	IMX6_BMODE_ONENAND,
 };
 
 enum imx6_bmode {
@@ -107,6 +120,7 @@ void set_chipselect_size(int const);
 
 void init_aips(void);
 void init_src(void);
+void init_snvs(void);
 void imx_wdog_disable_powerdown(void);
 
 int board_mmc_get_env_dev(int devno);
@@ -130,4 +144,7 @@ int mxs_wait_mask_clr(struct mxs_register_32 *reg, u32 mask, u32 timeout);
 
 unsigned long call_imx_sip(unsigned long id, unsigned long reg0,
 			   unsigned long reg1, unsigned long reg2);
+unsigned long call_imx_sip_ret2(unsigned long id, unsigned long reg0,
+				unsigned long *reg1, unsigned long reg2,
+				unsigned long reg3);
 #endif

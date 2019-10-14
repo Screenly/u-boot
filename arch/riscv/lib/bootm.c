@@ -1,79 +1,69 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2011 Andes Technology Corporation
  * Shawn Lin, Andes Technology Corporation <nobuhiro@andestech.com>
  * Macpaul Lin, Andes Technology Corporation <macpaul@andestech.com>
  * Rick Chen, Andes Technology Corporation <rick@andestech.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 #include <command.h>
+#include <dm.h>
+#include <dm/root.h>
 #include <image.h>
-#include <u-boot/zlib.h>
 #include <asm/byteorder.h>
-#include <asm/bootm.h>
+#include <asm/csr.h>
+#include <asm/smp.h>
+#include <dm/device.h>
+#include <dm/root.h>
+#include <u-boot/zlib.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+__weak void board_quiesce_devices(void)
+{
+}
 
 int arch_fixup_fdt(void *blob)
 {
 	return 0;
 }
 
-#if defined(CONFIG_SETUP_MEMORY_TAGS) || \
-	defined(CONFIG_CMDLINE_TAG) || \
-	defined(CONFIG_INITRD_TAG) || \
-	defined(CONFIG_SERIAL_TAG) || \
-	defined(CONFIG_REVISION_TAG)
-static void setup_start_tag(bd_t *bd);
-
-# ifdef CONFIG_SETUP_MEMORY_TAGS
-static void setup_memory_tags(bd_t *bd);
-# endif
-static void setup_commandline_tag(bd_t *bd, char *commandline);
-
-# ifdef CONFIG_INITRD_TAG
-static void setup_initrd_tag(bd_t *bd, ulong initrd_start, ulong initrd_end);
-# endif
-static void setup_end_tag(bd_t *bd);
-
-static struct tag *params;
-#endif /* CONFIG_SETUP_MEMORY_TAGS || CONFIG_CMDLINE_TAG || CONFIG_INITRD_TAG */
-
-int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
+/**
+ * announce_and_cleanup() - Print message and prepare for kernel boot
+ *
+ * @fake: non-zero to do everything except actually boot
+ */
+static void announce_and_cleanup(int fake)
 {
-	bd_t	*bd = gd->bd;
-	char	*s;
-	int	machid = bd->bi_arch_number;
-	void	(*theKernel)(int zero, int arch, uint params);
-
-#ifdef CONFIG_CMDLINE_TAG
-	char *commandline = env_get("bootargs");
+	printf("\nStarting kernel ...%s\n\n", fake ?
+		"(fake run for tracing)" : "");
+	bootstage_mark_name(BOOTSTAGE_ID_BOOTM_HANDOFF, "start_kernel");
+#ifdef CONFIG_BOOTSTAGE_FDT
+	bootstage_fdt_add_report();
+#endif
+#ifdef CONFIG_BOOTSTAGE_REPORT
+	bootstage_report();
 #endif
 
+#ifdef CONFIG_USB_DEVICE
+	udc_disconnect();
+#endif
+
+	board_quiesce_devices();
+
 	/*
-	 * allow the PREP bootm subcommand, it is required for bootm to work
+	 * Call remove function of all devices with a removal flag set.
+	 * This may be useful for last-stage operations, like cancelling
+	 * of DMA operation or releasing device internal buffers.
 	 */
-	if (flag & BOOTM_STATE_OS_PREP)
-		return 0;
+	dm_remove_devices_flags(DM_REMOVE_ACTIVE_ALL);
 
-	if ((flag != 0) && (flag != BOOTM_STATE_OS_GO))
-		return 1;
+	cleanup_before_linux();
+}
 
-	theKernel = (void (*)(int, int, uint))images->ep;
-
-	s = env_get("machid");
-	if (s) {
-		machid = simple_strtoul(s, NULL, 16);
-		printf("Using machid 0x%x from environment\n", machid);
-	}
-
-	bootstage_mark(BOOTSTAGE_ID_RUN_OS);
-
-	debug("## Transferring control to Linux (at address %08lx) ...\n",
-	       (ulong)theKernel);
-
+static void boot_prep_linux(bootm_headers_t *images)
+{
 	if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len) {
 #ifdef CONFIG_OF_LIBFDT
 		debug("using: FDT\n");
@@ -82,167 +72,66 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
 			hang();
 		}
 #endif
-	} else if (BOOTM_ENABLE_TAGS) {
-#if defined(CONFIG_SETUP_MEMORY_TAGS) || \
-	defined(CONFIG_CMDLINE_TAG) || \
-	defined(CONFIG_INITRD_TAG) || \
-	defined(CONFIG_SERIAL_TAG) || \
-	defined(CONFIG_REVISION_TAG)
-	setup_start_tag(bd);
-#ifdef CONFIG_SERIAL_TAG
-	setup_serial_tag(&params);
-#endif
-#ifdef CONFIG_REVISION_TAG
-	setup_revision_tag(&params);
-#endif
-#ifdef CONFIG_SETUP_MEMORY_TAGS
-	setup_memory_tags(bd);
-#endif
-#ifdef CONFIG_CMDLINE_TAG
-	setup_commandline_tag(bd, commandline);
-#endif
-#ifdef CONFIG_INITRD_TAG
-	if (images->rd_start && images->rd_end)
-		setup_initrd_tag(bd, images->rd_start, images->rd_end);
-#endif
-	setup_end_tag(bd);
-#endif
-
-	/* we assume that the kernel is in place */
-	printf("\nStarting kernel ...\n\n");
-
-#ifdef CONFIG_USB_DEVICE
-	{
-		extern void udc_disconnect(void);
-		udc_disconnect();
-	}
-#endif
-	}
-	cleanup_before_linux();
-	if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len)
-		theKernel(0, machid, (unsigned long)images->ft_addr);
-	else
-	theKernel(0, machid, bd->bi_boot_params);
-	/* does not return */
-
-	return 1;
-}
-
-#if defined(CONFIG_SETUP_MEMORY_TAGS) || \
-	defined(CONFIG_CMDLINE_TAG) || \
-	defined(CONFIG_INITRD_TAG) || \
-	defined(CONFIG_SERIAL_TAG) || \
-	defined(CONFIG_REVISION_TAG)
-static void setup_start_tag(bd_t *bd)
-{
-	params = (struct tag *)bd->bi_boot_params;
-
-	params->hdr.tag = ATAG_CORE;
-	params->hdr.size = tag_size(tag_core);
-
-	params->u.core.flags = 0;
-	params->u.core.pagesize = 0;
-	params->u.core.rootdev = 0;
-
-	params = tag_next(params);
-}
-
-#ifdef CONFIG_SETUP_MEMORY_TAGS
-static void setup_memory_tags(bd_t *bd)
-{
-	int i;
-
-	for (i = 0; i < CONFIG_NR_DRAM_BANKS; i++) {
-		params->hdr.tag = ATAG_MEM;
-		params->hdr.size = tag_size(tag_mem32);
-
-		params->u.mem.start = bd->bi_dram[i].start;
-		params->u.mem.size = bd->bi_dram[i].size;
-
-		params = tag_next(params);
+	} else {
+		printf("Device tree not found or missing FDT support\n");
+		hang();
 	}
 }
-#endif /* CONFIG_SETUP_MEMORY_TAGS */
 
-static void setup_commandline_tag(bd_t *bd, char *commandline)
+static void boot_jump_linux(bootm_headers_t *images, int flag)
 {
-	char *p;
-
-	if (!commandline)
-		return;
-
-	/* eat leading white space */
-	for (p = commandline; *p == ' '; p++)
-		;
-
-	/* skip non-existent command lines so the kernel will still
-	 * use its default command line.
-	 */
-	if (*p == '\0')
-		return;
-
-	params->hdr.tag = ATAG_CMDLINE;
-	params->hdr.size =
-		(sizeof(struct tag_header) + strlen(p) + 1 + 4) >> 2;
-
-	strcpy(params->u.cmdline.cmdline, p)
-		;
-
-	params = tag_next(params);
-}
-
-#ifdef CONFIG_INITRD_TAG
-static void setup_initrd_tag(bd_t *bd, ulong initrd_start, ulong initrd_end)
-{
-	/* an ATAG_INITRD node tells the kernel where the compressed
-	 * ramdisk can be found. ATAG_RDIMG is a better name, actually.
-	 */
-	params->hdr.tag = ATAG_INITRD2;
-	params->hdr.size = tag_size(tag_initrd);
-
-	params->u.initrd.start = initrd_start;
-	params->u.initrd.size = initrd_end - initrd_start;
-
-	params = tag_next(params);
-}
-#endif /* CONFIG_INITRD_TAG */
-
-#ifdef CONFIG_SERIAL_TAG
-void setup_serial_tag(struct tag **tmp)
-{
-	struct tag *params;
-	struct tag_serialnr serialnr;
-	void get_board_serial(struct tag_serialnr *serialnr);
-
-	params = *tmp;
-	get_board_serial(&serialnr);
-	params->hdr.tag = ATAG_SERIAL;
-	params->hdr.size = tag_size(tag_serialnr);
-	params->u.serialnr.low = serialnr.low;
-	params->u.serialnr.high = serialnr.high;
-	params = tag_next(params);
-	*tmp = params;
-}
+	void (*kernel)(ulong hart, void *dtb);
+	int fake = (flag & BOOTM_STATE_OS_FAKE_GO);
+#ifdef CONFIG_SMP
+	int ret;
 #endif
 
-#ifdef CONFIG_REVISION_TAG
-void setup_revision_tag(struct tag **in_params)
-{
-	u32 rev;
-	u32 get_board_rev(void);
+	kernel = (void (*)(ulong, void *))images->ep;
 
-	rev = get_board_rev();
-	params->hdr.tag = ATAG_REVISION;
-	params->hdr.size = tag_size(tag_revision);
-	params->u.revision.rev = rev;
-	params = tag_next(params);
+	bootstage_mark(BOOTSTAGE_ID_RUN_OS);
+
+	debug("## Transferring control to kernel (at address %08lx) ...\n",
+	      (ulong)kernel);
+
+	announce_and_cleanup(fake);
+
+	if (!fake) {
+		if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len) {
+#ifdef CONFIG_SMP
+			ret = smp_call_function(images->ep,
+						(ulong)images->ft_addr, 0);
+			if (ret)
+				hang();
+#endif
+			kernel(gd->arch.boot_hart, images->ft_addr);
+		}
+	}
 }
-#endif  /* CONFIG_REVISION_TAG */
 
-static void setup_end_tag(bd_t *bd)
+int do_bootm_linux(int flag, int argc, char * const argv[],
+		   bootm_headers_t *images)
 {
-	params->hdr.tag = ATAG_NONE;
-	params->hdr.size = 0;
+	/* No need for those on RISC-V */
+	if (flag & BOOTM_STATE_OS_BD_T || flag & BOOTM_STATE_OS_CMDLINE)
+		return -1;
+
+	if (flag & BOOTM_STATE_OS_PREP) {
+		boot_prep_linux(images);
+		return 0;
+	}
+
+	if (flag & (BOOTM_STATE_OS_GO | BOOTM_STATE_OS_FAKE_GO)) {
+		boot_jump_linux(images, flag);
+		return 0;
+	}
+
+	boot_prep_linux(images);
+	boot_jump_linux(images, flag);
+	return 0;
 }
 
-#endif /* CONFIG_SETUP_MEMORY_TAGS || CONFIG_CMDLINE_TAG || CONFIG_INITRD_TAG */
+int do_bootm_vxworks(int flag, int argc, char * const argv[],
+		     bootm_headers_t *images)
+{
+	return do_bootm_linux(flag, argc, argv, images);
+}

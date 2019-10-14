@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /* Copyright (C) 2004-2007 Freescale Semiconductor, Inc.
  * Hayden Fraser (Hayden.Fraser@freescale.com)
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _M5253DEMO_H
@@ -77,7 +76,7 @@
 		""
 #endif
 
-#define CONFIG_HOSTNAME		M5253DEMO
+#define CONFIG_HOSTNAME		"M5253DEMO"
 
 /* I2C */
 #define CONFIG_SYS_I2C
@@ -157,14 +156,12 @@
 #define FLASH_SST6401B		0x200
 #define SST_ID_xF6401B		0x236D236D
 
-#undef CONFIG_SYS_FLASH_CFI
 #ifdef CONFIG_SYS_FLASH_CFI
 /*
  * Unable to use CFI driver, due to incompatible sector erase command by SST.
  * Amd/Atmel use 0x30 for sector erase, SST use 0x50.
  * 0x30 is block erase in SST
  */
-#	define CONFIG_FLASH_CFI_DRIVER	1
 #	define CONFIG_SYS_FLASH_SIZE		0x800000
 #	define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
 #	define CONFIG_FLASH_CFI_LEGACY

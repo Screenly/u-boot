@@ -1,10 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Configuration header file for TI's k2hk-evm
  *
  * (C) Copyright 2012-2014
  *     Texas Instruments Incorporated, <www.ti.com>
- *
- * SPDX-License-Identifier:     GPL-2.0+
  */
 
 #ifndef __CONFIG_K2HK_EVM_H
@@ -40,9 +39,6 @@
 #define CONFIG_ENV_OFFSET			0x100000
 
 #include <configs/ti_armv7_keystone2.h>
-
-/* SPL SPI Loader Configuration */
-#define CONFIG_SPL_TEXT_BASE		0x0c200000
 
 #define SPI_MTD_PARTS KEYSTONE_SPI0_MTD_PARTS
 

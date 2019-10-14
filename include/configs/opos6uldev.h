@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2017 Armadeus Systems
  *
  * Configuration settings for the OPOS6ULDev board
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __OPOS6ULDEV_CONFIG_H
@@ -15,11 +14,7 @@
 #include "imx6_spl.h"
 
 #ifdef CONFIG_SPL_BUILD
-#undef CONFIG_DM_GPIO
-#undef CONFIG_DM_MMC
-#undef CONFIG_BLK
-
-#define CONFIG_MXC_UART_BASE		UART1_BASE
+#undef CONFIG_DM_REGULATOR
 #endif
 #endif
 
@@ -30,7 +25,6 @@
 #define CONFIG_STANDALONE_LOAD_ADDR	CONFIG_SYS_LOAD_ADDR
 
 /* Physical Memory Map */
-#define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_SDRAM_BASE		MMDC0_ARB_BASE_ADDR
 #define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
 #define CONFIG_SYS_INIT_RAM_SIZE	IRAM_SIZE
@@ -38,10 +32,6 @@
 	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
-
-/* MMC */
-#define CONFIG_SYS_FSL_ESDHC_ADDR 0
-#define CONFIG_SUPPORT_EMMC_BOOT
 
 /* USB */
 #ifdef CONFIG_USB_EHCI_MX6
@@ -57,10 +47,10 @@
 #define CONFIG_FEC_MXC_PHYADDR          0x1
 #define CONFIG_FEC_XCV_TYPE             RMII
 #define CONFIG_ETHPRIME			"FEC"
-#define CONFIG_MII
 #endif
 
 /* LCD */
+#ifndef CONFIG_SPL_BUILD
 #ifdef CONFIG_VIDEO
 #define CONFIG_VIDEO_LOGO
 #define CONFIG_SPLASH_SCREEN
@@ -71,6 +61,7 @@
 #define CONFIG_BMP_16BPP
 #define CONFIG_VIDEO_MXS
 #define MXS_LCDIF_BASE MX6UL_LCDIF1_BASE_ADDR
+#endif
 #endif
 
 /* Environment is stored in the eMMC boot partition */
@@ -85,7 +76,6 @@
 #define ACFG_CONSOLE_DEV        ttymxc0
 #define CONFIG_SYS_AUTOLOAD     "no"
 #define CONFIG_ROOTPATH         "/tftpboot/" __stringify(CONFIG_BOARD_NAME) "-root"
-#define CONFIG_PREBOOT          "run check_env"
 #define CONFIG_BOOTCOMMAND	"run emmcboot"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \

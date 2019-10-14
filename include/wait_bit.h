@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Wait for bit with timeout and ctrlc
  *
  * (C) Copyright 2015 Mateusz Kulikowski <mateusz.kulikowski@gmail.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __WAIT_BIT_H
@@ -73,10 +72,12 @@ static inline int wait_for_bit_##sfx(const void *reg,			\
 
 BUILD_WAIT_FOR_BIT(8, u8, readb)
 BUILD_WAIT_FOR_BIT(le16, u16, readw)
+BUILD_WAIT_FOR_BIT(16, u16, readw)
 #ifdef readw_be
 BUILD_WAIT_FOR_BIT(be16, u16, readw_be)
 #endif
 BUILD_WAIT_FOR_BIT(le32, u32, readl)
+BUILD_WAIT_FOR_BIT(32, u32, readl)
 #ifdef readl_be
 BUILD_WAIT_FOR_BIT(be32, u32, readl_be)
 #endif

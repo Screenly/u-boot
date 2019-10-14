@@ -1,16 +1,14 @@
+# SPDX-License-Identifier: GPL-2.0+
 #
 # (C) Copyright 2000-2007
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
-#
-# SPDX-License-Identifier:	GPL-2.0+
-#
 
 obj-$(CONFIG_USB_GADGET) += epautoconf.o config.o usbstring.o
 obj-$(CONFIG_USB_ETHER) += epautoconf.o config.o usbstring.o
 
 ifdef CONFIG_SPL_BUILD
-obj-$(CONFIG_SPL_USB_GADGET_SUPPORT) += g_dnl.o
-obj-$(CONFIG_SPL_DFU_SUPPORT) += f_dfu.o
+obj-$(CONFIG_SPL_USB_GADGET) += g_dnl.o
+obj-$(CONFIG_SPL_DFU) += f_dfu.o
 obj-$(CONFIG_SPL_USB_SDP_SUPPORT) += f_sdp.o
 endif
 

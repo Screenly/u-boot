@@ -1,16 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2000-2010
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
  *
  * (C) Copyright 2001 Sysgo Real-Time Solutions, GmbH <www.elinos.com>
  * Andreas Heppel <aheppel@sysgo.de>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 #include <command.h>
-#include <environment.h>
+#include <env.h>
+#include <env_internal.h>
 #include <linux/stddef.h>
 #if defined(CONFIG_I2C_ENV_EEPROM_BUS)
 #include <i2c.h>
@@ -132,9 +132,11 @@ static int env_eeprom_load(void)
 		gd->env_valid = ENV_REDUND;
 	} else {
 		/* both ok - check serial */
-		if (flags[0] == ACTIVE_FLAG && flags[1] == OBSOLETE_FLAG)
+		if (flags[0] == ENV_REDUND_ACTIVE &&
+		    flags[1] == ENV_REDUND_OBSOLETE)
 			gd->env_valid = ENV_VALID;
-		else if (flags[0] == OBSOLETE_FLAG && flags[1] == ACTIVE_FLAG)
+		else if (flags[0] == ENV_REDUND_OBSOLETE &&
+			 flags[1] == ENV_REDUND_ACTIVE)
 			gd->env_valid = ENV_REDUND;
 		else if (flags[0] == 0xFF && flags[1] == 0)
 			gd->env_valid = ENV_REDUND;
@@ -194,7 +196,7 @@ static int env_eeprom_save(void)
 	unsigned int off	= CONFIG_ENV_OFFSET;
 #ifdef CONFIG_ENV_OFFSET_REDUND
 	unsigned int off_red	= CONFIG_ENV_OFFSET_REDUND;
-	char flag_obsolete	= OBSOLETE_FLAG;
+	char flag_obsolete	= ENV_REDUND_OBSOLETE;
 #endif
 
 	rc = env_export(&env_new);
@@ -207,7 +209,7 @@ static int env_eeprom_save(void)
 		off_red	= CONFIG_ENV_OFFSET;
 	}
 
-	env_new.flags = ACTIVE_FLAG;
+	env_new.flags = ENV_REDUND_ACTIVE;
 #endif
 
 	rc = eeprom_bus_write(CONFIG_SYS_DEF_EEPROM_ADDR,

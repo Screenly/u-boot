@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2010-2016 Freescale Semiconductor, Inc.
  * Copyright 2017-2018 NXP Semiconductor
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -14,6 +13,7 @@
 
 #include <common.h>
 #include <cli.h>
+#include <env.h>
 #include <linux/ctype.h>
 #include <asm/types.h>
 #include <asm/io.h>

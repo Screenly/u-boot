@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Board functions for TI AM335X based rut board
  * (C) Copyright 2013 Siemens Schweiz AG
@@ -7,11 +8,10 @@
  * u-boot:/board/ti/am335x/board.c
  *
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
+#include <env.h>
 #include <errno.h>
 #include <spi.h>
 #include <spl.h>
@@ -34,8 +34,6 @@
 #include "board.h"
 #include "../common/factoryset.h"
 #include "../../../drivers/video/da8xx-fb.h"
-
-DECLARE_GLOBAL_DATA_PTR;
 
 /*
  * Read header information from EEPROM into global structure.

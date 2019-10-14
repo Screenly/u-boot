@@ -1,15 +1,15 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2017, STMicroelectronics - All Rights Reserved
  * Author(s): Patrice Chotard, <patrice.chotard@st.com> for STMicroelectronics.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#include <linux/sizes.h>
+
 /* ram memory-related information */
-#define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0x40000000
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
 #define PHYS_SDRAM_1_SIZE		0x3E000000
@@ -20,6 +20,7 @@
 /* Environment */
 
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR
+#define CONFIG_SYS_BOOTM_LEN		SZ_16M
 
 #define BOOT_TARGET_DEVICES(func) \
 	func(MMC, mmc, 0) \
@@ -32,6 +33,7 @@
 			"fdtfile=stih410-b2260.dtb\0"		\
 			"fdt_addr_r=0x47000000\0"		\
 			"scriptaddr=0x50000000\0"		\
+			"pxefile_addr_r=0x50100000\0"		\
 			"fdt_high=0xffffffffffffffff\0"		\
 			"initrd_high=0xffffffffffffffff\0"	\
 			"ramdisk_addr_r=0x48000000\0"		\

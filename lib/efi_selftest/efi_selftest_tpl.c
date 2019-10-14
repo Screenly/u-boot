@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * efi_selftest_events
+ * efi_selftest_tpl
  *
  * Copyright (c) 2017 Heinrich Schuchardt <xypron.glpk@gmx.de>
- *
- * SPDX-License-Identifier:     GPL-2.0+
  *
  * This unit test uses timer events to check the handling of
  * task priority levels.
@@ -152,7 +151,7 @@ static int execute(void)
 		return EFI_ST_FAILURE;
 	}
 	ret = boottime->set_timer(event_notify, EFI_TIMER_STOP, 0);
-	if (index != 0) {
+	if (ret != EFI_SUCCESS) {
 		efi_st_error("Could not cancel timer\n");
 		return EFI_ST_FAILURE;
 	}
@@ -165,7 +164,7 @@ static int execute(void)
 	/* Set 10 ms timer */
 	notification_count = 0;
 	ret = boottime->set_timer(event_notify, EFI_TIMER_PERIODIC, 100000);
-	if (index != 0) {
+	if (ret != EFI_SUCCESS) {
 		efi_st_error("Could not set timer\n");
 		return EFI_ST_FAILURE;
 	}

@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Code shared between SPL and U-Boot proper
  *
  * Copyright (c) 2015 Google, Inc
  * Written by Simon Glass <sjg@chromium.org>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -18,6 +17,23 @@ __weak void arch_setup_gd(struct global_data *gd_ptr)
 	gd = gd_ptr;
 }
 #endif /* !CONFIG_X86 && !CONFIG_ARM */
+
+/**
+ * This function is called after the position of the initial stack is
+ * determined in gd->start_addr_sp. Boards can override it to set up
+ * stack-checking markers.
+ */
+__weak void board_init_f_init_stack_protection(void)
+{
+#if CONFIG_IS_ENABLED(SYS_REPORT_STACK_F_USAGE)
+	ulong stack_bottom = gd->start_addr_sp -
+		CONFIG_VAL(SIZE_LIMIT_PROVIDE_STACK);
+
+	/* substact some safety margin (0x20) since stack is in use here */
+	memset((void *)stack_bottom, CONFIG_VAL(SYS_STACK_F_CHECK_BYTE),
+	       CONFIG_VAL(SIZE_LIMIT_PROVIDE_STACK) - 0x20);
+#endif
+}
 
 /*
  * Allocate reserved space for use as 'globals' from 'top' address and
@@ -127,6 +143,9 @@ void board_init_f_init_reserve(ulong base)
 	/* next alloc will be higher by one 'early malloc arena' size */
 	base += CONFIG_VAL(SYS_MALLOC_F_LEN);
 #endif
+
+	if (CONFIG_IS_ENABLED(SYS_REPORT_STACK_F_USAGE))
+		board_init_f_init_stack_protection();
 }
 
 /*

@@ -1,11 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  *  Portable Executable binary format structures
  *
  *  Copyright (c) 2016 Alexander Graf
  *
  *  Based on wine code
- *
- *  SPDX-License-Identifier:     GPL-2.0+
  */
 
 #ifndef _PE_H
@@ -34,18 +33,6 @@ typedef struct _IMAGE_DOS_HEADER {
 	uint16_t e_res2[10];	/* 28: Reserved words */
 	uint32_t e_lfanew;	/* 3c: Offset to extended header */
 } IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;
-
-#define IMAGE_DOS_SIGNATURE		0x5A4D     /* MZ   */
-#define IMAGE_NT_SIGNATURE		0x00004550 /* PE00 */
-
-#define IMAGE_FILE_MACHINE_ARM		0x01c0
-#define IMAGE_FILE_MACHINE_THUMB	0x01c2
-#define IMAGE_FILE_MACHINE_ARMNT	0x01c4
-#define IMAGE_FILE_MACHINE_AMD64	0x8664
-#define IMAGE_FILE_MACHINE_ARM64	0xaa64
-#define IMAGE_NT_OPTIONAL_HDR32_MAGIC	0x10b
-#define IMAGE_NT_OPTIONAL_HDR64_MAGIC	0x20b
-#define IMAGE_SUBSYSTEM_EFI_APPLICATION	10
 
 typedef struct _IMAGE_FILE_HEADER {
 	uint16_t Machine;
@@ -198,10 +185,13 @@ typedef struct _IMAGE_RELOCATION
 #define IMAGE_REL_BASED_MIPS_JMPADDR            5
 #define IMAGE_REL_BASED_ARM_MOV32A              5 /* yes, 5 too */
 #define IMAGE_REL_BASED_ARM_MOV32               5 /* yes, 5 too */
+#define IMAGE_REL_BASED_RISCV_HI20		5 /* yes, 5 too */
 #define IMAGE_REL_BASED_SECTION                 6
 #define IMAGE_REL_BASED_REL                     7
 #define IMAGE_REL_BASED_ARM_MOV32T              7 /* yes, 7 too */
 #define IMAGE_REL_BASED_THUMB_MOV32             7 /* yes, 7 too */
+#define IMAGE_REL_BASED_RISCV_LOW12I		7 /* yes, 7 too */
+#define IMAGE_REL_BASED_RISCV_LOW12S		8
 #define IMAGE_REL_BASED_MIPS_JMPADDR16          9
 #define IMAGE_REL_BASED_IA64_IMM64              9 /* yes, 9 too */
 #define IMAGE_REL_BASED_DIR64                   10

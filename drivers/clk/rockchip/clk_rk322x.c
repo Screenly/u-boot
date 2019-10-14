@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * (C) Copyright 2017 Rockchip Electronics Co., Ltd
- *
- * SPDX-License-Identifier:	GPL-2.0
  */
 
 #include <common.h>
@@ -10,14 +9,12 @@
 #include <errno.h>
 #include <syscon.h>
 #include <asm/io.h>
-#include <asm/arch/clock.h>
-#include <asm/arch/cru_rk322x.h>
-#include <asm/arch/hardware.h>
+#include <asm/arch-rockchip/clock.h>
+#include <asm/arch-rockchip/cru_rk322x.h>
+#include <asm/arch-rockchip/hardware.h>
 #include <dm/lists.h>
 #include <dt-bindings/clock/rk3228-cru.h>
 #include <linux/log2.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 enum {
 	VCO_MAX_HZ	= 3200U * 1000000,
@@ -124,10 +121,10 @@ static void rkclk_init(struct rk322x_cru *cru)
 	assert((aclk_div + 1) * BUS_ACLK_HZ == GPLL_HZ && aclk_div <= 0x1f);
 
 	pclk_div = BUS_ACLK_HZ / BUS_PCLK_HZ - 1;
-	assert((pclk_div + 1) * BUS_PCLK_HZ == GPLL_HZ && pclk_div <= 0x7);
+	assert((pclk_div + 1) * BUS_PCLK_HZ == BUS_ACLK_HZ && pclk_div <= 0x7);
 
 	hclk_div = BUS_ACLK_HZ / BUS_HCLK_HZ - 1;
-	assert((hclk_div + 1) * BUS_HCLK_HZ == GPLL_HZ && hclk_div <= 0x3);
+	assert((hclk_div + 1) * BUS_HCLK_HZ == BUS_ACLK_HZ && hclk_div <= 0x3);
 
 	rk_clrsetreg(&cru->cru_clksel_con[0],
 		     BUS_ACLK_PLL_SEL_MASK | BUS_ACLK_DIV_MASK,
@@ -220,6 +217,7 @@ static ulong rockchip_mmc_get_clk(struct rk322x_cru *cru, uint clk_general_rate,
 	switch (periph) {
 	case HCLK_EMMC:
 	case SCLK_EMMC:
+	case SCLK_EMMC_SAMPLE:
 		con = readl(&cru->cru_clksel_con[11]);
 		mux = (con & EMMC_PLL_MASK) >> EMMC_PLL_SHIFT;
 		con = readl(&cru->cru_clksel_con[12]);
@@ -296,6 +294,7 @@ static ulong rockchip_mmc_set_clk(struct rk322x_cru *cru, uint clk_general_rate,
 	switch (periph) {
 	case HCLK_EMMC:
 	case SCLK_EMMC:
+	case SCLK_EMMC_SAMPLE:
 		rk_clrsetreg(&cru->cru_clksel_con[11],
 			     EMMC_PLL_MASK,
 			     mux << EMMC_PLL_SHIFT);
@@ -475,7 +474,7 @@ static int rk322x_clk_ofdata_to_platdata(struct udevice *dev)
 {
 	struct rk322x_clk_priv *priv = dev_get_priv(dev);
 
-	priv->cru = (struct rk322x_cru *)devfdt_get_addr(dev);
+	priv->cru = dev_read_addr_ptr(dev);
 
 	return 0;
 }

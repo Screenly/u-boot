@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2015
  * Texas Instruments Incorporated, <www.ti.com>
  *
  * Lokesh Vutla <lokeshvutla@ti.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -203,8 +202,9 @@ void __recalibrate_iodelay_end(int ret)
 		return;
 	}
 
-	if (!ret)
-		ret = isolate_io(DEISOLATE_IO);
+	/* Deisolate IO if it is already isolated */
+	if (readl((*ctrl)->ctrl_core_sma_sw_0) & CTRL_ISOLATE_MASK)
+		isolate_io(DEISOLATE_IO);
 
 	/* lock IODELAY CONFIG registers */
 	writel(CFG_IODELAY_LOCK_KEY, (*ctrl)->iodelay_config_base +
@@ -240,6 +240,12 @@ void __recalibrate_iodelay_end(int ret)
 	default:
 		debug("IODELAY: IO delay recalibration successfully completed\n");
 	}
+
+	/* If there is an error during iodelay recalibration, SoC is in a bad
+	 * state. Do not progress any further.
+	 */
+	if (ret)
+		hang();
 
 	return;
 }

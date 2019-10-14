@@ -1,19 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright (C) 2017 Armadeus Systems
- *
- * SPDX-License-Identifier:	GPL-2.0+
+ * Copyright (C) 2018 Armadeus Systems
  */
 
-#include <asm/arch/clock.h>
 #include <asm/arch/mx6-pins.h>
-#include <asm/arch/opos6ul.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/io.h>
 #include <common.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_VIDEO_MXS
 #define LCD_PAD_CTRL ( \
@@ -53,8 +48,6 @@ int setup_lcd(void)
 	struct gpio_desc backlight;
 	int ret;
 
-	enable_lcdif_clock(LCDIF1_BASE_ADDR, 1);
-
 	imx_iomux_v3_setup_multiple_pads(lcd_pads, ARRAY_SIZE(lcd_pads));
 
 	/* Set Brightness to high */
@@ -77,27 +70,6 @@ int setup_lcd(void)
 }
 #endif
 
-#ifdef CONFIG_USB_EHCI_MX6
-#define USB_OTHERREGS_OFFSET	0x800
-#define UCTRL_PWR_POL		(1 << 9)
-
-int board_ehci_hcd_init(int port)
-{
-	u32 *usbnc_usb_ctrl;
-
-	if (port > 1)
-		return -EINVAL;
-
-	usbnc_usb_ctrl = (u32 *)(USB_BASE_ADDR + USB_OTHERREGS_OFFSET +
-				 port * 4);
-
-	/* Set Power polarity */
-	setbits_le32(usbnc_usb_ctrl, UCTRL_PWR_POL);
-
-	return 0;
-}
-#endif
-
 int opos6ul_board_late_init(void)
 {
 #ifdef CONFIG_VIDEO_MXS
@@ -106,20 +78,3 @@ int opos6ul_board_late_init(void)
 
 	return 0;
 }
-
-#ifdef CONFIG_SPL_BUILD
-#define UART_PAD_CTRL (						\
-	PAD_CTL_HYS | PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED |	\
-	PAD_CTL_DSE_40ohm | PAD_CTL_SRE_FAST			\
-)
-
-static iomux_v3_cfg_t const uart1_pads[] = {
-	MX6_PAD_UART1_TX_DATA__UART1_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	MX6_PAD_UART1_RX_DATA__UART1_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-};
-
-void opos6ul_setup_uart_debug(void)
-{
-	imx_iomux_v3_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads));
-}
-#endif /* CONFIG_SPL_BUILD */

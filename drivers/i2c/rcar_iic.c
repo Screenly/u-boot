@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Renesas RCar IIC driver
  *
@@ -6,8 +7,6 @@
  * Based on
  * Copyright (C) 2011, 2013 Renesas Solutions Corp.
  * Copyright (C) 2011, 2013 Nobuhiro Iwamatsu <nobuhiro.iwamatsu.yj@renesas.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -59,12 +58,14 @@ static void sh_irq_dte(struct udevice *dev)
 static int sh_irq_dte_with_tack(struct udevice *dev)
 {
 	struct rcar_iic_priv *priv = dev_get_priv(dev);
+	u8 icsr;
 	int i;
 
 	for (i = 0; i < IRQ_WAIT; i++) {
-		if (RCAR_IC_DTE & readb(priv->base + RCAR_IIC_ICSR))
+		icsr = readb(priv->base + RCAR_IIC_ICSR);
+		if (RCAR_IC_DTE & icsr)
 			break;
-		if (RCAR_IC_TACK & readb(priv->base + RCAR_IIC_ICSR))
+		if (RCAR_IC_TACK & icsr)
 			return -ETIMEDOUT;
 		udelay(10);
 	}

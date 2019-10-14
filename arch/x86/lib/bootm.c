@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2002
  * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
  * Marius Groeger <mgroeger@sysgo.de>
  *
  * Copyright (C) 2001  Erik Mouw (J.A.K.Mouw@its.tudelft.nl)
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -28,10 +27,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define COMMAND_LINE_OFFSET 0x9000
 
-__weak void board_quiesce_devices(void)
-{
-}
-
 void bootm_announce_and_cleanup(void)
 {
 	printf("\nStarting kernel ...\n\n");
@@ -40,7 +35,7 @@ void bootm_announce_and_cleanup(void)
 	timestamp_add_now(TS_U_BOOT_START_KERNEL);
 #endif
 	bootstage_mark_name(BOOTSTAGE_ID_BOOTM_HANDOFF, "start_kernel");
-#ifdef CONFIG_BOOTSTAGE_REPORT
+#if CONFIG_IS_ENABLED(BOOTSTAGE_REPORT)
 	bootstage_report();
 #endif
 
@@ -121,6 +116,10 @@ static int boot_prep_linux(bootm_headers_t *images)
 		char *base_ptr;
 
 		base_ptr = (char *)load_zimage(data, len, &load_address);
+		if (!base_ptr) {
+			puts("## Kernel loading failed ...\n");
+			goto error;
+		}
 		images->os.load = load_address;
 		cmd_line_dest = base_ptr + COMMAND_LINE_OFFSET;
 		images->ep = (ulong)base_ptr;

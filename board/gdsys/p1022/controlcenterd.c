@@ -23,6 +23,7 @@
 
 #include <common.h>
 #include <command.h>
+#include <env.h>
 #include <pci.h>
 #include <asm/processor.h>
 #include <asm/mmu.h>
@@ -43,8 +44,6 @@
 #include <watchdog.h>
 #include "../common/dp501.h"
 #include "controlcenterd-id.h"
-
-DECLARE_GLOBAL_DATA_PTR;
 
 enum {
 	HWVER_100 = 0,

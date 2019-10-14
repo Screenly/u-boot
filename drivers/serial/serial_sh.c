@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * SuperH SCIF device driver.
  * Copyright (C) 2013  Renesas Electronics Corporation
  * Copyright (C) 2007,2008,2010, 2014 Nobuhiro Iwamatsu
  * Copyright (C) 2002 - 2008  Paul Mundt
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -20,10 +19,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#if defined(CONFIG_CPU_SH7760) || \
-	defined(CONFIG_CPU_SH7780) || \
-	defined(CONFIG_CPU_SH7785) || \
-	defined(CONFIG_CPU_SH7786)
+#if defined(CONFIG_CPU_SH7780)
 static int scif_rxfill(struct uart_port *port)
 {
 	return sci_in(port, SCRFDR) & 0xff;
@@ -39,14 +35,6 @@ static int scif_rxfill(struct uart_port *port)
 		/* SCIF2 */
 		return sci_in(port, SCFDR) & SCIF2_RFDC_MASK;
 	}
-}
-#elif defined(CONFIG_ARCH_SH7372)
-static int scif_rxfill(struct uart_port *port)
-{
-	if (port->type == PORT_SCIFA)
-		return sci_in(port, SCFDR) & SCIF_RFDC_MASK;
-	else
-		return sci_in(port, SCRFDR);
 }
 #else
 static int scif_rxfill(struct uart_port *port)
@@ -64,6 +52,9 @@ static void sh_serial_init_generic(struct uart_port *port)
 	sci_out(port, SCFCR, SCFCR_RFRST|SCFCR_TFRST);
 	sci_in(port, SCFCR);
 	sci_out(port, SCFCR, 0);
+#if defined(CONFIG_RZA1)
+	sci_out(port, SCSPTR, 0x0003);
+#endif
 }
 
 static void
@@ -248,7 +239,9 @@ U_BOOT_DRIVER(serial_sh) = {
 	.platdata_auto_alloc_size = sizeof(struct sh_serial_platdata),
 	.probe	= sh_serial_probe,
 	.ops	= &sh_serial_ops,
+#if !CONFIG_IS_ENABLED(OF_CONTROL)
 	.flags	= DM_FLAG_PRE_RELOC,
+#endif
 	.priv_auto_alloc_size = sizeof(struct uart_port),
 };
 
@@ -270,6 +263,8 @@ U_BOOT_DRIVER(serial_sh) = {
 # define SCIF_BASE	SCIF6_BASE
 #elif defined(CONFIG_CONS_SCIF7)
 # define SCIF_BASE	SCIF7_BASE
+#elif defined(CONFIG_CONS_SCIFA0)
+# define SCIF_BASE	SCIFA0_BASE
 #else
 # error "Default SCIF doesn't set....."
 #endif

@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (c) 2014 Google, Inc
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -15,6 +14,8 @@
 #include <dm/util.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define SPI_DEFAULT_SPEED_HZ 100000
 
 static int spi_set_speed_mode(struct udevice *bus, int speed, int mode)
 {
@@ -59,16 +60,16 @@ int dm_spi_claim_bus(struct udevice *dev)
 			speed = spi->max_hz;
 	}
 	if (!speed)
-		speed = 100000;
+		speed = SPI_DEFAULT_SPEED_HZ;
 	if (speed != slave->speed) {
 		int ret = spi_set_speed_mode(bus, speed, slave->mode);
 
 		if (ret)
-			return ret;
+			return log_ret(ret);
 		slave->speed = speed;
 	}
 
-	return ops->claim_bus ? ops->claim_bus(dev) : 0;
+	return log_ret(ops->claim_bus ? ops->claim_bus(dev) : 0);
 }
 
 void dm_spi_release_bus(struct udevice *dev)
@@ -93,7 +94,7 @@ int dm_spi_xfer(struct udevice *dev, unsigned int bitlen,
 
 int spi_claim_bus(struct spi_slave *slave)
 {
-	return dm_spi_claim_bus(slave->dev);
+	return log_ret(dm_spi_claim_bus(slave->dev));
 }
 
 void spi_release_bus(struct spi_slave *slave)
@@ -105,6 +106,30 @@ int spi_xfer(struct spi_slave *slave, unsigned int bitlen,
 	     const void *dout, void *din, unsigned long flags)
 {
 	return dm_spi_xfer(slave->dev, bitlen, dout, din, flags);
+}
+
+int spi_write_then_read(struct spi_slave *slave, const u8 *opcode,
+			size_t n_opcode, const u8 *txbuf, u8 *rxbuf,
+			size_t n_buf)
+{
+	unsigned long flags = SPI_XFER_BEGIN;
+	int ret;
+
+	if (n_buf == 0)
+		flags |= SPI_XFER_END;
+
+	ret = spi_xfer(slave, n_opcode * 8, opcode, NULL, flags);
+	if (ret) {
+		debug("spi: failed to send command (%zu bytes): %d\n",
+		      n_opcode, ret);
+	} else if (n_buf != 0) {
+		ret = spi_xfer(slave, n_buf * 8, txbuf, rxbuf, SPI_XFER_END);
+		if (ret)
+			debug("spi: failed to transfer %zu bytes of data: %d\n",
+			      n_buf, ret);
+	}
+
+	return ret;
 }
 
 #if !CONFIG_IS_ENABLED(OF_PLATDATA)
@@ -274,7 +299,7 @@ int spi_get_bus_and_cs(int busnum, int cs, int speed, int mode,
 	bool created = false;
 	int ret;
 
-#if CONFIG_IS_ENABLED(OF_PLATDATA)
+#if CONFIG_IS_ENABLED(OF_PLATDATA) || CONFIG_IS_ENABLED(OF_PRIOR_STAGE)
 	ret = uclass_first_device_err(UCLASS_SPI, &bus);
 #else
 	ret = uclass_get_device_by_seq(UCLASS_SPI, busnum, &bus);
@@ -301,7 +326,13 @@ int spi_get_bus_and_cs(int busnum, int cs, int speed, int mode,
 		}
 		plat = dev_get_parent_platdata(dev);
 		plat->cs = cs;
-		plat->max_hz = speed;
+		if (speed) {
+			plat->max_hz = speed;
+		} else {
+			printf("Warning: SPI speed fallback to %u kHz\n",
+			       SPI_DEFAULT_SPEED_HZ / 1000);
+			plat->max_hz = SPI_DEFAULT_SPEED_HZ;
+		}
 		plat->mode = mode;
 		created = true;
 	} else if (ret) {
@@ -321,7 +352,9 @@ int spi_get_bus_and_cs(int busnum, int cs, int speed, int mode,
 	}
 
 	plat = dev_get_parent_platdata(dev);
-	if (!speed) {
+
+	/* get speed and mode from platdata when available */
+	if (plat->max_hz) {
 		speed = plat->max_hz;
 		mode = plat->mode;
 	}
@@ -375,7 +408,8 @@ int spi_slave_ofdata_to_platdata(struct udevice *dev,
 	int value;
 
 	plat->cs = dev_read_u32_default(dev, "reg", -1);
-	plat->max_hz = dev_read_u32_default(dev, "spi-max-frequency", 0);
+	plat->max_hz = dev_read_u32_default(dev, "spi-max-frequency",
+					    SPI_DEFAULT_SPEED_HZ);
 	if (dev_read_bool(dev, "spi-cpol"))
 		mode |= SPI_CPOL;
 	if (dev_read_bool(dev, "spi-cpha"))

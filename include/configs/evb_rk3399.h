@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2016 Rockchip Electronics Co., Ltd
- *
- * SPDX-License-Identifier:     GPL-2.0+
  */
 
 #ifndef __EVB_RK3399_H
@@ -9,7 +8,7 @@
 
 #include <configs/rk3399_common.h>
 
-#define CONFIG_SYS_MMC_ENV_DEV 1
+#define CONFIG_SYS_MMC_ENV_DEV 0
 
 #define SDRAM_BANK_SIZE			(2UL << 30)
 

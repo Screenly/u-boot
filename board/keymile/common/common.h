@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2008
  * Heiko Schocher, DENX Software Engineering, hs@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __KEYMILE_COMMON_H
@@ -120,10 +119,6 @@ struct bfticu_iomap {
 	u8	pack18[6];
 	u8	pb_dbug;
 };
-
-#if !defined(CONFIG_PIGGY_MAC_ADRESS_OFFSET)
-#define CONFIG_PIGGY_MAC_ADRESS_OFFSET	0
-#endif
 
 int ethernet_present(void);
 int ivm_read_eeprom(unsigned char *buf, int len);

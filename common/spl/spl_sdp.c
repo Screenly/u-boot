@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2016 Toradex
  * Author: Stefan Agner <stefan.agner@toradex.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -11,8 +10,6 @@
 #include <g_dnl.h>
 #include <sdp.h>
 
-DECLARE_GLOBAL_DATA_PTR;
-
 static int spl_sdp_load_image(struct spl_image_info *spl_image,
 			      struct spl_boot_device *bootdev)
 {
@@ -20,7 +17,11 @@ static int spl_sdp_load_image(struct spl_image_info *spl_image,
 	const int controller_index = 0;
 
 	g_dnl_clear_detach();
-	g_dnl_register("usb_dnl_sdp");
+	ret = g_dnl_register("usb_dnl_sdp");
+	if (ret) {
+		pr_err("SDP dnl register failed: %d\n", ret);
+		return ret;
+	}
 
 	ret = sdp_init(controller_index);
 	if (ret) {
@@ -28,10 +29,14 @@ static int spl_sdp_load_image(struct spl_image_info *spl_image,
 		return -ENODEV;
 	}
 
-	/* This command typically does not return but jumps to an image */
-	sdp_handle(controller_index);
-	pr_err("SDP ended\n");
+	/*
+	 * This command either loads a legacy image, jumps and never returns,
+	 * or it loads a FIT image and returns it to be handled by the SPL
+	 * code.
+	 */
+	ret = spl_sdp_handle(controller_index, spl_image);
+	debug("SDP ended\n");
 
-	return -EINVAL;
+	return ret;
 }
 SPL_LOAD_IMAGE_METHOD("USB SDP", 0, BOOT_DEVICE_BOARD, spl_sdp_load_image);

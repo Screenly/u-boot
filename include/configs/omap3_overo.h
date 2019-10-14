@@ -1,31 +1,24 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Configuration settings for the Gumstix Overo board.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
 #define __CONFIG_H
-
-#define CONFIG_NR_DRAM_BANKS	2	/* CS1 may or may not be populated */
 
 #include <configs/ti_omap3_common.h>
 /*
  * We are only ever GP parts and will utilize all of the "downloaded image"
  * area in SRAM which starts at 0x40200000 and ends at 0x4020FFFF (64KB).
  */
-#undef CONFIG_SPL_TEXT_BASE
-#define CONFIG_SPL_TEXT_BASE		0x40200000
 
 /* call misc_init_r */
-#define CONFIG_MISC_INIT_R
 
 /* pass the revision tag */
 #define CONFIG_REVISION_TAG
 
 /* override size of malloc() pool */
 #undef CONFIG_SYS_MALLOC_LEN
-#define CONFIG_ENV_SIZE		(128 << 10)	/* 128 KiB sector */
 /* Shift 128 << 15 provides 4 MiB heap to support UBI commands.
  * Shift 128 << 10 provides 128 KiB heap for limited-memory devices. */
 #define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + (128 << 15))
@@ -33,7 +26,6 @@
 /* I2C Support */
 
 /* TWL4030 LED */
-#define CONFIG_TWL4030_LED
 
 /* USB EHCI */
 #define CONFIG_OMAP_EHCI_PHY1_RESET_GPIO	183
@@ -41,8 +33,6 @@
 /* commands to include */
 
 #ifdef CONFIG_NAND
-#define CONFIG_MTD_PARTITIONS	/* required for UBI partition support */
-
 /* NAND block size is 128 KiB.  Synchronize these values with
  * overo_nand_partitions in mach-omap2/board-overo.c in Linux:
  *  xloader              4 * NAND_BLOCK_SIZE = 512 KiB
@@ -54,8 +44,6 @@
 #endif /* CONFIG_NAND */
 
 /* Board NAND Info. */
-#define CONFIG_SYS_NAND_ADDR		NAND_BASE	/* physical address */
-							/* to access nand */
 /* Environment information */
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \

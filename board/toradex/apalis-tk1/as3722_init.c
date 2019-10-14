@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (c) 2012-2016 Toradex, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -43,6 +42,29 @@ void pmic_enable_cpu_vdd(void)
 	 */
 	udelay(10 * 1000);
 #endif
+
+	/*
+	 * Make sure all non-fused regulators are down.
+	 * That way we're in known state after software reboot from linux
+	 */
+	tegra_i2c_ll_write_addr(AS3722_I2C_ADDR, 2);
+	tegra_i2c_ll_write_data(0x0003, I2C_SEND_2_BYTES);
+	udelay(10 * 1000);
+	tegra_i2c_ll_write_addr(AS3722_I2C_ADDR, 2);
+	tegra_i2c_ll_write_data(0x0004, I2C_SEND_2_BYTES);
+	udelay(10 * 1000);
+	tegra_i2c_ll_write_addr(AS3722_I2C_ADDR, 2);
+	tegra_i2c_ll_write_data(0x001b, I2C_SEND_2_BYTES);
+	udelay(10 * 1000);
+	tegra_i2c_ll_write_addr(AS3722_I2C_ADDR, 2);
+	tegra_i2c_ll_write_data(0x0014, I2C_SEND_2_BYTES);
+	udelay(10 * 1000);
+	tegra_i2c_ll_write_addr(AS3722_I2C_ADDR, 2);
+	tegra_i2c_ll_write_data(0x001a, I2C_SEND_2_BYTES);
+	udelay(10 * 1000);
+	tegra_i2c_ll_write_addr(AS3722_I2C_ADDR, 2);
+	tegra_i2c_ll_write_data(0x0019, I2C_SEND_2_BYTES);
+	udelay(10 * 1000);
 
 	debug("%s: Setting VDD_CPU to 1.0V via AS3722 reg 0/4D\n", __func__);
 	/*

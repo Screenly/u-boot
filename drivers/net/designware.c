@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2010
  * Vipin Kumar, ST Micoelectronics, vipin.kumar@st.com.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -16,14 +15,13 @@
 #include <miiphy.h>
 #include <malloc.h>
 #include <pci.h>
+#include <reset.h>
 #include <linux/compiler.h>
 #include <linux/err.h>
 #include <linux/kernel.h>
 #include <asm/io.h>
 #include <power/regulator.h>
 #include "designware.h"
-
-DECLARE_GLOBAL_DATA_PTR;
 
 static int dw_mdio_read(struct mii_dev *bus, int addr, int devad, int reg)
 {
@@ -283,6 +281,15 @@ int designware_eth_init(struct dw_eth_dev *priv, u8 *enetaddr)
 
 	writel(readl(&dma_p->busmode) | DMAMAC_SRST, &dma_p->busmode);
 
+	/*
+	 * When a MII PHY is used, we must set the PS bit for the DMA
+	 * reset to succeed.
+	 */
+	if (priv->phydev->interface == PHY_INTERFACE_MODE_MII)
+		writel(readl(&mac_p->conf) | MII_PORTSELECT, &mac_p->conf);
+	else
+		writel(readl(&mac_p->conf) & ~MII_PORTSELECT, &mac_p->conf);
+
 	start = get_timer(0);
 	while (readl(&dma_p->busmode) & DMAMAC_SRST) {
 		if (get_timer(start) >= CONFIG_MACRESET_TIMEOUT) {
@@ -373,24 +380,28 @@ static int _dw_eth_send(struct dw_eth_dev *priv, void *packet, int length)
 		return -EPERM;
 	}
 
-	length = max(length, ETH_ZLEN);
-
 	memcpy((void *)data_start, packet, length);
+	if (length < ETH_ZLEN) {
+		memset(&((char *)data_start)[length], 0, ETH_ZLEN - length);
+		length = ETH_ZLEN;
+	}
 
 	/* Flush data to be sent */
 	flush_dcache_range(data_start, data_end);
 
 #if defined(CONFIG_DW_ALTDESCRIPTOR)
 	desc_p->txrx_status |= DESC_TXSTS_TXFIRST | DESC_TXSTS_TXLAST;
-	desc_p->dmamac_cntl |= (length << DESC_TXCTRL_SIZE1SHFT) &
-			       DESC_TXCTRL_SIZE1MASK;
+	desc_p->dmamac_cntl = (desc_p->dmamac_cntl & ~DESC_TXCTRL_SIZE1MASK) |
+			      ((length << DESC_TXCTRL_SIZE1SHFT) &
+			      DESC_TXCTRL_SIZE1MASK);
 
 	desc_p->txrx_status &= ~(DESC_TXSTS_MSK);
 	desc_p->txrx_status |= DESC_TXSTS_OWNBYDMA;
 #else
-	desc_p->dmamac_cntl |= ((length << DESC_TXCTRL_SIZE1SHFT) &
-			       DESC_TXCTRL_SIZE1MASK) | DESC_TXCTRL_TXLAST |
-			       DESC_TXCTRL_TXFIRST;
+	desc_p->dmamac_cntl = (desc_p->dmamac_cntl & ~DESC_TXCTRL_SIZE1MASK) |
+			      ((length << DESC_TXCTRL_SIZE1SHFT) &
+			      DESC_TXCTRL_SIZE1MASK) | DESC_TXCTRL_TXLAST |
+			      DESC_TXCTRL_TXFIRST;
 
 	desc_p->txrx_status = DESC_TXSTS_OWNBYDMA;
 #endif
@@ -469,17 +480,15 @@ static int _dw_free_pkt(struct dw_eth_dev *priv)
 static int dw_phy_init(struct dw_eth_dev *priv, void *dev)
 {
 	struct phy_device *phydev;
-	int mask = 0xffffffff, ret;
+	int phy_addr = -1, ret;
 
 #ifdef CONFIG_PHY_ADDR
-	mask = 1 << CONFIG_PHY_ADDR;
+	phy_addr = CONFIG_PHY_ADDR;
 #endif
 
-	phydev = phy_find_by_mask(priv->bus, mask, priv->interface);
+	phydev = phy_connect(priv->bus, phy_addr, dev, priv->interface);
 	if (!phydev)
 		return -ENODEV;
-
-	phy_connect_dev(phydev, dev);
 
 	phydev->supported &= PHY_GBIT_FEATURES;
 	if (priv->max_speed) {
@@ -666,9 +675,10 @@ int designware_eth_probe(struct udevice *dev)
 	struct dw_eth_dev *priv = dev_get_priv(dev);
 	u32 iobase = pdata->iobase;
 	ulong ioaddr;
-	int ret;
+	int ret, err;
+	struct reset_ctl_bulk reset_bulk;
 #ifdef CONFIG_CLK
-	int i, err, clock_nb;
+	int i, clock_nb;
 
 	priv->clock_count = 0;
 	clock_nb = dev_count_phandle_with_args(dev, "clocks", "#clock-cells");
@@ -713,6 +723,12 @@ int designware_eth_probe(struct udevice *dev)
 	}
 #endif
 
+	ret = reset_get_bulk(dev, &reset_bulk);
+	if (ret)
+		dev_warn(dev, "Can't get reset: %d\n", ret);
+	else
+		reset_deassert_bulk(&reset_bulk);
+
 #ifdef CONFIG_DM_PCI
 	/*
 	 * If we are on PCI bus, either directly attached to a PCI root port,
@@ -735,13 +751,23 @@ int designware_eth_probe(struct udevice *dev)
 	priv->interface = pdata->phy_interface;
 	priv->max_speed = pdata->max_speed;
 
-	dw_mdio_init(dev->name, dev);
+	ret = dw_mdio_init(dev->name, dev);
+	if (ret) {
+		err = ret;
+		goto mdio_err;
+	}
 	priv->bus = miiphy_get_dev_by_name(dev->name);
 
 	ret = dw_phy_init(priv, dev);
 	debug("%s, ret=%d\n", __func__, ret);
+	if (!ret)
+		return 0;
 
-	return ret;
+	/* continue here for cleanup if no PHY found */
+	err = ret;
+	mdio_unregister(priv->bus);
+	mdio_free(priv->bus);
+mdio_err:
 
 #ifdef CONFIG_CLK
 clk_err:
@@ -749,8 +775,8 @@ clk_err:
 	if (ret)
 		pr_err("failed to disable all clocks\n");
 
-	return err;
 #endif
+	return err;
 }
 
 static int designware_eth_remove(struct udevice *dev)
@@ -821,10 +847,12 @@ int designware_eth_ofdata_to_platdata(struct udevice *dev)
 
 static const struct udevice_id designware_eth_ids[] = {
 	{ .compatible = "allwinner,sun7i-a20-gmac" },
-	{ .compatible = "altr,socfpga-stmmac" },
 	{ .compatible = "amlogic,meson6-dwmac" },
 	{ .compatible = "amlogic,meson-gx-dwmac" },
+	{ .compatible = "amlogic,meson-gxbb-dwmac" },
+	{ .compatible = "amlogic,meson-axg-dwmac" },
 	{ .compatible = "st,stm32-dwmac" },
+	{ .compatible = "snps,arc-dwmac-3.70a" },
 	{ }
 };
 

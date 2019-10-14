@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2017 Álvaro Fernández Rojas <noltari@gmail.com>
  *
  * Derived from linux/arch/mips/bcm63xx/cpu.c:
  *	Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
  *	Copyright (C) 2009 Florian Fainelli <florian@openwrt.org>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -13,8 +12,6 @@
 #include <dm.h>
 #include <errno.h>
 #include <asm/io.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 #define REV_CHIPID_SHIFT		16
 #define REV_CHIPID_MASK			(0xffff << REV_CHIPID_SHIFT)
@@ -50,6 +47,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define DMIPSPLLCFG_6358_N2_SHIFT	29
 #define DMIPSPLLCFG_6358_N2_MASK	(0x7 << DMIPSPLLCFG_6358_N2_SHIFT)
 
+#define REG_BCM6362_MISC_STRAPBUS	0x1814
+#define STRAPBUS_6362_FCVO_SHIFT	1
+#define STRAPBUS_6362_FCVO_MASK		(0x1f << STRAPBUS_6362_FCVO_SHIFT)
+
 #define REG_BCM6368_DDR_DMIPSPLLCFG	0x12a0
 #define DMIPSPLLCFG_6368_P1_SHIFT	0
 #define DMIPSPLLCFG_6368_P1_MASK	(0xf << DMIPSPLLCFG_6368_P1_SHIFT)
@@ -64,6 +65,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define REG_BCM63268_MISC_STRAPBUS	0x1814
 #define STRAPBUS_63268_FCVO_SHIFT	21
 #define STRAPBUS_63268_FCVO_MASK	(0xf << STRAPBUS_63268_FCVO_SHIFT)
+
+#define REG_BCM6838_OTP_BRCMBITS0	0x440
+#define VIPER_6838_FREQ_SHIFT		18
+#define VIPER_6838_FREQ_MASK		(0x7 << VIPER_6838_FREQ_SHIFT)
 
 struct bmips_cpu_priv;
 
@@ -194,6 +199,44 @@ static ulong bcm6358_get_cpu_freq(struct bmips_cpu_priv *priv)
 	return (16 * 1000000 * n1 * n2) / m1;
 }
 
+static ulong bcm6362_get_cpu_freq(struct bmips_cpu_priv *priv)
+{
+	unsigned int mips_pll_fcvo;
+
+	mips_pll_fcvo = readl_be(priv->regs + REG_BCM6362_MISC_STRAPBUS);
+	mips_pll_fcvo = (mips_pll_fcvo & STRAPBUS_6362_FCVO_MASK)
+			>> STRAPBUS_6362_FCVO_SHIFT;
+
+	switch (mips_pll_fcvo) {
+	case 0x03:
+	case 0x0b:
+	case 0x13:
+	case 0x1b:
+		return 240000000;
+	case 0x04:
+	case 0x0c:
+	case 0x14:
+	case 0x1c:
+		return 160000000;
+	case 0x05:
+	case 0x0e:
+	case 0x16:
+	case 0x1e:
+	case 0x1f:
+		return 400000000;
+	case 0x06:
+		return 440000000;
+	case 0x07:
+	case 0x17:
+		return 384000000;
+	case 0x15:
+	case 0x1d:
+		return 200000000;
+	default:
+		return 320000000;
+	}
+}
+
 static ulong bcm6368_get_cpu_freq(struct bmips_cpu_priv *priv)
 {
 	unsigned int tmp, p1, p2, ndiv, m1;
@@ -228,6 +271,26 @@ static ulong bcm63268_get_cpu_freq(struct bmips_cpu_priv *priv)
 	case 0xb:
 	case 0xf:
 		return 400000000;
+	default:
+		return 0;
+	}
+}
+
+static ulong bcm6838_get_cpu_freq(struct bmips_cpu_priv *priv)
+{
+	unsigned int mips_viper_freq;
+
+	mips_viper_freq = readl_be(priv->regs + REG_BCM6838_OTP_BRCMBITS0);
+	mips_viper_freq = (mips_viper_freq & VIPER_6838_FREQ_MASK)
+		>> VIPER_6838_FREQ_SHIFT;
+
+	switch (mips_viper_freq) {
+	case 0x0:
+		return 600000000;
+	case 0x1:
+		return 400000000;
+	case 0x2:
+		return 240000000;
 	default:
 		return 0;
 	}
@@ -289,6 +352,12 @@ static const struct bmips_cpu_hw bmips_cpu_bcm6358 = {
 	.get_cpu_count = bcm6358_get_cpu_count,
 };
 
+static const struct bmips_cpu_hw bmips_cpu_bcm6362 = {
+	.get_cpu_desc = bmips_short_cpu_desc,
+	.get_cpu_freq = bcm6362_get_cpu_freq,
+	.get_cpu_count = bcm6358_get_cpu_count,
+};
+
 static const struct bmips_cpu_hw bmips_cpu_bcm6368 = {
 	.get_cpu_desc = bmips_short_cpu_desc,
 	.get_cpu_freq = bcm6368_get_cpu_freq,
@@ -298,6 +367,12 @@ static const struct bmips_cpu_hw bmips_cpu_bcm6368 = {
 static const struct bmips_cpu_hw bmips_cpu_bcm63268 = {
 	.get_cpu_desc = bmips_long_cpu_desc,
 	.get_cpu_freq = bcm63268_get_cpu_freq,
+	.get_cpu_count = bcm6358_get_cpu_count,
+};
+
+static const struct bmips_cpu_hw bmips_cpu_bcm6838 = {
+	.get_cpu_desc = bmips_short_cpu_desc,
+	.get_cpu_freq = bcm6838_get_cpu_freq,
 	.get_cpu_count = bcm6358_get_cpu_count,
 };
 
@@ -350,8 +425,7 @@ int bmips_cpu_bind(struct udevice *dev)
 {
 	struct cpu_platdata *plat = dev_get_parent_platdata(dev);
 
-	plat->cpu_id = fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev),
-		"reg", -1);
+	plat->cpu_id = dev_read_u32_default(dev, "reg", -1);
 	plat->device_id = read_c0_prid();
 
 	return 0;
@@ -362,14 +436,11 @@ int bmips_cpu_probe(struct udevice *dev)
 	struct bmips_cpu_priv *priv = dev_get_priv(dev);
 	const struct bmips_cpu_hw *hw =
 		(const struct bmips_cpu_hw *)dev_get_driver_data(dev);
-	fdt_addr_t addr;
-	fdt_size_t size;
 
-	addr = devfdt_get_addr_size_index(dev_get_parent(dev), 0, &size);
-	if (addr == FDT_ADDR_T_NONE)
+	priv->regs = dev_remap_addr(dev_get_parent(dev));
+	if (!priv->regs)
 		return -EINVAL;
 
-	priv->regs = ioremap(addr, size);
 	priv->hw = hw;
 
 	return 0;
@@ -395,11 +466,17 @@ static const struct udevice_id bmips_cpu_ids[] = {
 		.compatible = "brcm,bcm6358-cpu",
 		.data = (ulong)&bmips_cpu_bcm6358,
 	}, {
+		.compatible = "brcm,bcm6362-cpu",
+		.data = (ulong)&bmips_cpu_bcm6362,
+	}, {
 		.compatible = "brcm,bcm6368-cpu",
 		.data = (ulong)&bmips_cpu_bcm6368,
 	}, {
 		.compatible = "brcm,bcm63268-cpu",
 		.data = (ulong)&bmips_cpu_bcm63268,
+	}, {
+		.compatible = "brcm,bcm6838-cpu",
+		.data = (ulong)&bmips_cpu_bcm6838,
 	},
 	{ /* sentinel */ }
 };

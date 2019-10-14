@@ -1,16 +1,14 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * cm_t43.h
  *
  * Copyright (C) 2015 Compulab, Ltd.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_CM_T43_H
 #define __CONFIG_CM_T43_H
 
 #define CONFIG_CM_T43
-#define CONFIG_ARCH_CPU_INIT
 #define CONFIG_MAX_RAM_BANK_SIZE	(2048 << 20)	/* 2GB */
 #define CONFIG_SYS_TIMERBASE		0x48040000	/* Use Timer2 */
 
@@ -45,8 +43,6 @@
 					 50, 51, 52, 53, 54, 55, 56, 57, }
 
 /* CPSW Ethernet support */
-#define CONFIG_DRIVER_TI_CPSW
-#define CONFIG_MII
 #define CONFIG_BOOTP_DEFAULT
 #define CONFIG_BOOTP_SEND_HOSTNAME
 #define CONFIG_PHY_ATHEROS
@@ -55,11 +51,6 @@
 /* USB support */
 #define CONFIG_USB_XHCI_OMAP
 #define CONFIG_AM437X_USB2PHY2_HOST
-
-/* SPI Flash support */
-#define CONFIG_TI_SPI_MMAP
-#define CONFIG_SF_DEFAULT_SPEED		48000000
-#define CONFIG_DEFAULT_SPI_MODE		SPI_MODE_3
 
 /* Power */
 #define CONFIG_POWER
@@ -83,15 +74,8 @@
 #include <configs/ti_armv7_omap.h>
 #undef CONFIG_SYS_MONITOR_LEN
 
-#define CONFIG_ENV_SIZE			(16 * 1024)
-#define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-
 #define V_OSCK				24000000  /* Clock output from T2 */
 #define V_SCLK				(V_OSCK)
-
-#define CONFIG_ENV_SECT_SIZE		(64 * 1024)
-#define CONFIG_ENV_OFFSET		(768 * 1024)
-#define CONFIG_ENV_SPI_MAX_HZ           48000000
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"loadaddr=0x80200000\0" \
@@ -128,14 +112,9 @@
 		"run emmcboot; " \
 	"fi;"
 
-#define CONFIG_CONS_INDEX		1
-
 /* SPL defines. */
-#define CONFIG_SPL_TEXT_BASE		0x40300350
 #define CONFIG_SYS_SPL_ARGS_ADDR	(CONFIG_SYS_SDRAM_BASE + (128 << 20))
-#define CONFIG_SYS_SPI_U_BOOT_OFFS	(256 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
-#define CONFIG_SPL_SPI_LOAD
 
 /* EEPROM */
 #define CONFIG_ENV_EEPROM_IS_ON_I2C

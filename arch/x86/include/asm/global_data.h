@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2002-2010
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef	__ASM_GBL_DATA_H
@@ -84,7 +83,7 @@ struct arch_global_data {
 	const struct pch_gpio_map *gpio_map;	/* board GPIO map */
 	struct memory_info meminfo;	/* Memory information */
 	struct pei_memory_info pei_meminfo;	/* PEI memory information */
-#ifdef CONFIG_HAVE_FSP
+#ifdef CONFIG_USE_HOB
 	void *hob_list;			/* FSP HOB list */
 #endif
 	struct mtrr_request mtrr_req[MAX_MTRR_REQUESTS];
@@ -137,11 +136,5 @@ static inline __attribute__((no_instrument_function)) gd_t *get_fs_gd_ptr(void)
 # endif
 
 #endif
-
-/*
- * Our private Global Data Flags
- */
-#define GD_FLG_COLD_BOOT	0x10000	/* Cold Boot */
-#define GD_FLG_WARM_BOOT	0x20000	/* Warm Boot */
 
 #endif /* __ASM_GBL_DATA_H */

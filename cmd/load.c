@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2000-2004
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -11,6 +10,7 @@
 #include <common.h>
 #include <command.h>
 #include <console.h>
+#include <env.h>
 #include <s_record.h>
 #include <net.h>
 #include <exports.h>

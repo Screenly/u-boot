@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2002
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
@@ -17,8 +18,6 @@
  *
  *   $Id: cmdlinepart.c,v 1.17 2004/11/26 11:18:47 lavinen Exp $
  *   Copyright 2002 SYSGO Real-Time Solutions GmbH
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -73,6 +72,7 @@
  */
 #include <common.h>
 #include <command.h>
+#include <env.h>
 #include <malloc.h>
 #include <jffs2/jffs2.h>
 #include <linux/list.h>

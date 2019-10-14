@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2000
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -18,7 +17,6 @@
 #include <command.h>
 #include <console.h>
 #include <hash.h>
-#include <inttypes.h>
 #include <mapmem.h>
 #include <watchdog.h>
 #include <asm/io.h>
@@ -276,8 +274,7 @@ static int do_mem_cmp(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		if (word1 != word2) {
 			ulong offset = buf1 - base;
 #ifdef CONFIG_SYS_SUPPORT_64BIT_DATA
-			printf("%s at 0x%p (%#0*"PRIx64") != %s at 0x%p (%#0*"
-			       PRIx64 ")\n",
+			printf("%s at 0x%p (%#0*llx) != %s at 0x%p (%#0*llx)\n",
 			       type, (void *)(addr1 + offset), size, word1,
 			       type, (void *)(addr2 + offset), size, word2);
 #else
@@ -1001,7 +998,7 @@ mod_mem(cmd_tbl_t *cmdtp, int incrflag, int flag, int argc, char * const argv[])
 			printf(" %08x", *((u32 *)ptr));
 #ifdef CONFIG_SYS_SUPPORT_64BIT_DATA
 		else if (size == 8)
-			printf(" %016" PRIx64, *((u64 *)ptr));
+			printf(" %016llx", *((u64 *)ptr));
 #endif
 		else if (size == 2)
 			printf(" %04x", *((u16 *)ptr));
@@ -1083,6 +1080,49 @@ static int do_mem_crc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	return hash_command("crc32", flags, cmdtp, flag, ac, av);
 }
 
+#endif
+
+#ifdef CONFIG_CMD_RANDOM
+static int do_random(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	unsigned long addr, len;
+	unsigned long seed; // NOT INITIALIZED ON PURPOSE
+	unsigned int *buf, *start;
+	unsigned char *buf8;
+	unsigned int i;
+
+	if (argc < 3 || argc > 4) {
+		printf("usage: %s <addr> <len> [<seed>]\n", argv[0]);
+		return 0;
+	}
+
+	len = simple_strtoul(argv[2], NULL, 16);
+	addr = simple_strtoul(argv[1], NULL, 16);
+
+	if (argc == 4) {
+		seed = simple_strtoul(argv[3], NULL, 16);
+		if (seed == 0) {
+			printf("The seed cannot be 0. Using 0xDEADBEEF.\n");
+			seed = 0xDEADBEEF;
+		}
+	} else {
+		seed = get_timer(0) ^ rand();
+	}
+
+	srand(seed);
+	start = map_sysmem(addr, len);
+	buf = start;
+	for (i = 0; i < (len / 4); i++)
+		*buf++ = rand();
+
+	buf8 = (unsigned char *)buf;
+	for (i = 0; i < (len % 4); i++)
+		*buf8++ = rand() & 0xFF;
+
+	unmap_sysmem(start);
+	printf("%lu bytes filled with random data\n", len);
+	return 1;
+}
 #endif
 
 /**************************************************/
@@ -1251,5 +1291,14 @@ U_BOOT_CMD(
 	meminfo,	3,	1,	do_mem_info,
 	"display memory information",
 	""
+);
+#endif
+
+#ifdef CONFIG_CMD_RANDOM
+U_BOOT_CMD(
+	random,	4,	0,	do_random,
+	"fill memory with random pattern",
+	"<addr> <len> [<seed>]\n"
+	"   - Fill 'len' bytes of memory starting at 'addr' with random data\n"
 );
 #endif

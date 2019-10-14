@@ -1,16 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (c) Copyright 2011 by Tigris Elektronik GmbH
  *
  * Author:
  *  Maximilian Schwerin <mvs@tigris.de>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 
 #include <command.h>
-#include <environment.h>
+#include <env.h>
+#include <env_internal.h>
 #include <linux/stddef.h>
 #include <malloc.h>
 #include <memalign.h>
@@ -30,8 +30,6 @@
 #  define CMD_SAVEENV
 # endif
 #endif
-
-DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CMD_SAVEENV
 static int env_fat_save(void)
@@ -89,8 +87,10 @@ static int env_fat_load(void)
 	int dev, part;
 	int err;
 
+#ifdef CONFIG_MMC
 	if (!strcmp(CONFIG_ENV_FAT_INTERFACE, "mmc"))
 		mmc_initialize(NULL);
+#endif
 
 	part = blk_get_device_part_str(CONFIG_ENV_FAT_INTERFACE,
 					CONFIG_ENV_FAT_DEVICE_AND_PART,
@@ -123,7 +123,7 @@ static int env_fat_load(void)
 	return env_import(buf, 1);
 
 err_env_relocate:
-	set_default_env(NULL);
+	env_set_default(NULL, 0);
 
 	return -EIO;
 }

@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Copyright (c) 2016 Google, Inc
- *
- * SPDX-License-Identifier:	GPL-2.0
  */
 
 #ifndef __asm_arch_cpu_h
@@ -21,9 +20,6 @@
 #define CPUID_BROADWELL_C0	0x306d2
 #define CPUID_BROADWELL_D0	0x306d3
 #define CPUID_BROADWELL_E0	0x306d4
-
-/* Broadwell bus clock is fixed at 100MHz */
-#define BROADWELL_BCLK		100
 
 #define BROADWELL_FAMILY_ULT	0x306d0
 

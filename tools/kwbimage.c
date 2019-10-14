@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Image manipulator for Marvell SoCs
  *  supports Kirkwood, Dove, Armada 370, Armada XP, and Armada 38x
  *
  * (C) Copyright 2013 Thomas Petazzoni
  * <thomas.petazzoni@free-electrons.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  *
  * Not implemented: support for the register headers in v1 images
  */
@@ -702,7 +701,7 @@ int kwb_verify(RSA *key, void *data, int datasz, struct sig_v1 *sig,
 		goto err_ctx;
 	}
 
-	if (!EVP_VerifyFinal(ctx, sig->sig, sizeof(sig->sig), evp_key)) {
+	if (EVP_VerifyFinal(ctx, sig->sig, sizeof(sig->sig), evp_key) != 1) {
 		ret = openssl_err("Could not verify signature");
 		goto err_ctx;
 	}
@@ -1274,6 +1273,13 @@ static void *image_create_v1(size_t *imagesz, struct image_tool_params *params,
 	e = image_find_option(IMAGE_CFG_DEBUG);
 	if (e)
 		main_hdr->flags = e->debug ? 0x1 : 0;
+	e = image_find_option(IMAGE_CFG_BINARY);
+	if (e) {
+		char *s = strrchr(e->binary.file, '/');
+
+		if (strcmp(s, "/binary.0") == 0)
+			main_hdr->destaddr = cpu_to_le32(params->addr);
+	}
 
 #if defined(CONFIG_KWB_SECURE)
 	if (image_get_csk_index() >= 0) {
@@ -1616,6 +1622,10 @@ static int kwbimage_verify_header(unsigned char *ptr, int image_size,
 				  struct image_tool_params *params)
 {
 	uint8_t checksum;
+	size_t header_size = kwbimage_header_size(ptr);
+
+	if (header_size > image_size)
+		return -FDT_ERR_BADSTRUCTURE;
 
 	if (!main_hdr_checksum_ok(ptr))
 		return -FDT_ERR_BADSTRUCTURE;

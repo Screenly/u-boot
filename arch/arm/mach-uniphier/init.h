@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2015-2016 Socionext Inc.
  *   Author: Masahiro Yamada <yamada.masahiro@socionext.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __MACH_INIT_H
@@ -103,5 +102,13 @@ unsigned int uniphier_boot_device_raw(void);
 int uniphier_have_internal_stm(void);
 int uniphier_boot_from_backend(void);
 int uniphier_pin_init(const char *pinconfig_name);
+#ifdef CONFIG_ARM64
+void uniphier_mem_map_init(unsigned long dram_base, unsigned long dram_size);
+#else
+static inline void uniphier_mem_map_init(unsigned long dram_base,
+					 unsigned long dram_size)
+{
+}
+#endif
 
 #endif /* __MACH_INIT_H */

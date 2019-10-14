@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2015 Google, Inc
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -15,8 +14,6 @@
 #include <dm/test.h>
 #include <dm/uclass-internal.h>
 #include <test/ut.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 /* Test that sandbox USB works correctly */
 static int dm_test_usb_base(struct unit_test_state *uts)
@@ -128,7 +125,7 @@ static int dm_test_usb_keyb(struct unit_test_state *uts)
 	/* Initially there should be no characters */
 	ut_asserteq(0, tstc());
 
-	ut_assertok(uclass_get_device_by_name(UCLASS_USB_EMUL, "keyb",
+	ut_assertok(uclass_get_device_by_name(UCLASS_USB_EMUL, "keyb@3",
 					      &dev));
 
 	/*

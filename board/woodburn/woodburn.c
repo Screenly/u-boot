@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2012, Stefano Babic <sbabic@denx.de>
  *
  * Based on flea3.c and mx35pdk.c
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -18,7 +17,7 @@
 #include <fsl_pmic.h>
 #include <mc13892.h>
 #include <mmc.h>
-#include <fsl_esdhc.h>
+#include <fsl_esdhc_imx.h>
 #include <linux/types.h>
 #include <asm/gpio.h>
 #include <asm/arch/sys_proto.h>
@@ -207,7 +206,7 @@ int board_init(void)
 	return 0;
 }
 
-#if defined(CONFIG_FSL_ESDHC)
+#if defined(CONFIG_FSL_ESDHC_IMX)
 struct fsl_esdhc_cfg esdhc_cfg = {MMC_SDHC1_BASE_ADDR};
 
 int board_mmc_init(bd_t *bis)

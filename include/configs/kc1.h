@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Amazon Kindle Fire (first generation) codename kc1 config
  *
  * Copyright (C) 2016 Paul Kocialkowski <contact@paulk.fr>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -27,8 +26,6 @@
  * Board
  */
 
-#define CONFIG_MISC_INIT_R
-
 /*
  * Clocks
  */
@@ -39,8 +36,6 @@
 /*
  * DRAM
  */
-
-#define CONFIG_NR_DRAM_BANKS	1
 
 /*
  * Memory
@@ -75,7 +70,6 @@
  * SPL
  */
 
-#define CONFIG_SPL_TEXT_BASE		0x40300000
 #define CONFIG_SPL_MAX_SIZE		(SRAM_SCRATCH_SPACE_ADDR - \
 					 CONFIG_SPL_TEXT_BASE)
 #define CONFIG_SPL_BSS_START_ADDR	0x80000000
@@ -97,7 +91,6 @@
 #define CONFIG_SYS_NS16550_REG_SIZE	(-4)
 #define CONFIG_SYS_NS16550_CLK		48000000
 #define CONFIG_SYS_NS16550_COM3		UART3_BASE
-#define CONFIG_CONS_INDEX		3
 
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 4800, 9600, 19200, 38400, 57600, \
 					  115200 }
@@ -109,8 +102,6 @@
 /*
  * Environment
  */
-
-#define CONFIG_ENV_SIZE		(128 * 1024)
 
 #define CONFIG_ENV_OVERWRITE
 

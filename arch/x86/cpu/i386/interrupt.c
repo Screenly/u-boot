@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2008-2011
  * Graeme Russ, <graeme.russ@gmail.com>
@@ -7,12 +8,11 @@
  *
  * Portions of this file are derived from the Linux kernel source
  *  Copyright (C) 1991, 1992  Linus Torvalds
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 #include <dm.h>
+#include <efi_loader.h>
 #include <asm/control_regs.h>
 #include <asm/i8259.h>
 #include <asm/interrupt.h>
@@ -38,7 +38,7 @@ static char *exceptions[] = {
 	"Overflow",
 	"BOUND Range Exceeded",
 	"Invalid Opcode (Undefined Opcode)",
-	"Device Not Avaiable (No Math Coprocessor)",
+	"Device Not Available (No Math Coprocessor)",
 	"Double Fault",
 	"Coprocessor Segment Overrun",
 	"Invalid TSS",
@@ -64,6 +64,18 @@ static char *exceptions[] = {
 	"Reserved",
 	"Reserved"
 };
+
+/**
+ * show_efi_loaded_images() - show loaded UEFI images
+ *
+ * List all loaded UEFI images.
+ *
+ * @eip:	instruction pointer
+ */
+static void show_efi_loaded_images(uintptr_t eip)
+{
+	efi_print_image_infos((void *)eip);
+}
 
 static void dump_regs(struct irq_regs *regs)
 {
@@ -145,6 +157,7 @@ static void dump_regs(struct irq_regs *regs)
 		printf("0x%8.8lx : 0x%8.8lx\n", sp, (ulong)readl(sp));
 		sp -= 4;
 	}
+	show_efi_loaded_images(eip);
 }
 
 static void do_exception(struct irq_regs *regs)
@@ -265,7 +278,9 @@ int interrupt_init(void)
 	i8259_init();
 #endif
 
+#ifdef CONFIG_APIC
 	lapic_setup();
+#endif
 
 	/* Initialize core interrupt and exception functionality of CPU */
 	cpu_init_interrupts();

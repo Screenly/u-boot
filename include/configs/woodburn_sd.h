@@ -1,11 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2011, Stefano Babic <sbabic@denx.de>
  *
  * (C) Copyright 2008-2010 Freescale Semiconductor, Inc.
  *
  * Configuration for the woodburn board.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -20,7 +19,6 @@
  * SPL
  */
 
-#define CONFIG_SPL_TEXT_BASE		0x10002300
 #define CONFIG_SPL_MAX_SIZE		(64 * 1024)	/* 8 KB for stack */
 #define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
 

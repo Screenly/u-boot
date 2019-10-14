@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Freescale i.MX28 APBH DMA driver
  *
@@ -6,8 +7,6 @@
  *
  * Based on code from LTIB:
  * Copyright (C) 2010 Freescale Semiconductor, Inc. All Rights Reserved.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <linux/list.h>
@@ -82,7 +81,7 @@ static int mxs_dma_read_semaphore(int channel)
 	return tmp;
 }
 
-#ifndef	CONFIG_SYS_DCACHE_OFF
+#if !CONFIG_IS_ENABLED(SYS_DCACHE_OFF)
 void mxs_dma_flush_desc(struct mxs_dma_desc *desc)
 {
 	uint32_t addr;

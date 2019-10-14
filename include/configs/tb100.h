@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2011-2014 Pierrick Hascoet, Abilis Systems
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _CONFIG_TB100_H_
@@ -52,12 +51,6 @@
 /*
  * Command line configuration
  */
-
-/*
- * Environment settings
- */
-#define CONFIG_ENV_SIZE			SZ_2K
-#define CONFIG_ENV_OFFSET		0
 
 /*
  * Environment configuration

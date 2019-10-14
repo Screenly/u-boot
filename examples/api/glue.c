@@ -1,10 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2007-2008 Semihalf, Rafal Jaworowski <raj@semihalf.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
+#include <env.h>
 #include <linux/types.h>
 #include <api_public.h>
 
@@ -366,7 +366,7 @@ const char * ub_env_enum(const char *last)
 
 	/*
 	 * It's OK to pass only the name piece as last (and not the whole
-	 * 'name=val' string), since the API_ENUM_ENV call uses envmatch()
+	 * 'name=val' string), since the API_ENUM_ENV call uses env_match()
 	 * internally, which handles such case
 	 */
 	if (!syscall(API_ENV_ENUM, NULL, last, &env))

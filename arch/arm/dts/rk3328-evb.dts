@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2016 Rockchip Electronics Co., Ltd
- *
- * SPDX-License-Identifier:     GPL-2.0+
  */
 
 /dts-v1/;
@@ -114,11 +113,6 @@
 
 &usb20_otg {
 	vbus-supply = <&vcc5v0_otg>;
-	status = "okay";
-};
-
-&usb_host0_xhci {
-	vbus-supply = <&vcc5v0_host_xhci>;
 	status = "okay";
 };
 

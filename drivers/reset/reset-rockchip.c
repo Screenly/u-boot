@@ -1,14 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * (C) Copyright 2017 Rockchip Electronics Co., Ltd
- *
- * SPDX-License-Identifier: GPL-2.0
  */
 
 #include <common.h>
 #include <dm.h>
 #include <reset-uclass.h>
 #include <linux/io.h>
-#include <asm/arch/hardware.h>
+#include <asm/arch-rockchip/hardware.h>
 #include <dm/lists.h>
 /*
  * Each reg has 16 bits reset signal for devices

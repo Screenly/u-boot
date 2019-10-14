@@ -1,10 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * WORK Microwave work_92105 board configuration file
  *
  * (C) Copyright 2014  DENX Software Engineering GmbH
  * Written-by: Albert ARIBAUD <albert.aribaud@3adev.fr>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_WORK_92105_H__
@@ -20,20 +19,13 @@
  */
 #define CONFIG_MACH_TYPE		736
 
-#define CONFIG_SYS_ICACHE_OFF
-#define CONFIG_SYS_DCACHE_OFF
 #if !defined(CONFIG_SPL_BUILD)
 #define CONFIG_SKIP_LOWLEVEL_INIT
 #endif
-#define CONFIG_BOARD_EARLY_INIT_R
-
-/* generate LPC32XX-specific SPL image */
-#define CONFIG_LPC32XX_SPL
 
 /*
  * Memory configurations
  */
-#define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_MALLOC_LEN		SZ_1M
 #define CONFIG_SYS_SDRAM_BASE		EMC_DYCS0_BASE
 #define CONFIG_SYS_SDRAM_SIZE		SZ_128M
@@ -56,7 +48,6 @@
 
 #define CONFIG_PHY_SMSC
 #define CONFIG_LPC32XX_ETH
-#define CONFIG_PHY_ADDR 0
 #define CONFIG_SYS_FAULT_ECHO_LINK_DOWN
 /* FIXME: remove "Waiting for PHY auto negotiation to complete..." message */
 
@@ -145,7 +136,6 @@
  */
 
 /* SPL will be executed at offset 0 */
-#define CONFIG_SPL_TEXT_BASE 0x00000000
 /* SPL will use SRAM as stack */
 #define CONFIG_SPL_STACK     0x0000FFF8
 /* Use the framework and generic lib */
@@ -153,7 +143,6 @@
 /* SPL will load U-Boot from NAND offset 0x40000 */
 #define CONFIG_SPL_NAND_DRIVERS
 #define CONFIG_SPL_NAND_BASE
-#define CONFIG_SPL_NAND_BOOT
 #define CONFIG_SYS_NAND_U_BOOT_OFFS  0x00040000
 #define CONFIG_SPL_PAD_TO 0x20000
 /* U-Boot will be 0x40000 bytes, loaded and run at CONFIG_SYS_TEXT_BASE */

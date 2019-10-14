@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * (C) Copyright 2012 Stephen Warren
  *
  * See file CREDITS for list of people who contributed to this
  * project.
- *
- * SPDX-License-Identifier:	GPL-2.0
  */
 
 #include <common.h>
@@ -24,11 +23,7 @@
 /* max ticks timeout */
 #define BCM2835_WDOG_MAX_TIMEOUT	0x000fffff
 
-#ifdef CONFIG_BCM2835_WDT
-extern void hw_watchdog_disable(void);
-#else
 void hw_watchdog_disable(void) {}
-#endif
 
 __efi_runtime_data struct bcm2835_wdog_regs *wdog_regs =
 	(struct bcm2835_wdog_regs *)BCM2835_WDOG_PHYSADDR;
@@ -60,12 +55,11 @@ void __efi_runtime EFIAPI efi_reset_system(
 {
 	u32 val;
 
-	switch (reset_type) {
-	case EFI_RESET_COLD:
-	case EFI_RESET_WARM:
+	if (reset_type == EFI_RESET_COLD ||
+	    reset_type == EFI_RESET_WARM ||
+	    reset_type == EFI_RESET_PLATFORM_SPECIFIC) {
 		reset_cpu(0);
-		break;
-	case EFI_RESET_SHUTDOWN:
+	} else if (reset_type == EFI_RESET_SHUTDOWN) {
 		/*
 		 * We set the watchdog hard reset bit here to distinguish this reset
 		 * from the normal (full) reset. bootcode.bin will not reboot after a
@@ -76,15 +70,14 @@ void __efi_runtime EFIAPI efi_reset_system(
 		val |= BCM2835_WDOG_RSTS_RASPBERRYPI_HALT;
 		writel(val, &wdog_regs->rsts);
 		reset_cpu(0);
-		break;
 	}
 
 	while (1) { }
 }
 
-void efi_reset_system_init(void)
+efi_status_t efi_reset_system_init(void)
 {
-	efi_add_runtime_mmio(&wdog_regs, sizeof(*wdog_regs));
+	return efi_add_runtime_mmio(&wdog_regs, sizeof(*wdog_regs));
 }
 
 #endif

@@ -1,14 +1,15 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Common SPI Interface: Controller-specific definitions
  *
  * (C) Copyright 2001
  * Gerald Van Baren, Custom IDEAS, vanbaren@cideas.com.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _SPI_H_
 #define _SPI_H_
+
+#include <common.h>
 
 /* SPI mode flags */
 #define SPI_CPHA	BIT(0)			/* clock phase */
@@ -115,13 +116,6 @@ struct spi_slave {
 #define SPI_XFER_MMAP		BIT(2)	/* Memory Mapped start */
 #define SPI_XFER_MMAP_END	BIT(3)	/* Memory Mapped End */
 };
-
-/**
- * Initialization, must be called once on start up.
- *
- * TODO: I don't think we really need this.
- */
-void spi_init(void);
 
 /**
  * spi_do_alloc_slave - Allocate a new SPI slave (internal)
@@ -253,6 +247,26 @@ int spi_set_wordlen(struct spi_slave *slave, unsigned int wordlen);
  */
 int  spi_xfer(struct spi_slave *slave, unsigned int bitlen, const void *dout,
 		void *din, unsigned long flags);
+
+/**
+ * spi_write_then_read - SPI synchronous write followed by read
+ *
+ * This performs a half duplex transaction in which the first transaction
+ * is to send the opcode and if the length of buf is non-zero then it start
+ * the second transaction as tx or rx based on the need from respective slave.
+ *
+ * @slave:	The SPI slave device with which opcode/data will be exchanged
+ * @opcode:	opcode used for specific transfer
+ * @n_opcode:	size of opcode, in bytes
+ * @txbuf:	buffer into which data to be written
+ * @rxbuf:	buffer into which data will be read
+ * @n_buf:	size of buf (whether it's [tx|rx]buf), in bytes
+ *
+ * Returns: 0 on success, not 0 on failure
+ */
+int spi_write_then_read(struct spi_slave *slave, const u8 *opcode,
+			size_t n_opcode, const u8 *txbuf, u8 *rxbuf,
+			size_t n_buf);
 
 /* Copy memory mapped data */
 void spi_flash_copy_mmap(void *data, void *offset, size_t len);
@@ -404,6 +418,15 @@ struct dm_spi_ops {
 		    void *din, unsigned long flags);
 
 	/**
+	 * Optimized handlers for SPI memory-like operations.
+	 *
+	 * Optimized/dedicated operations for interactions with SPI memory. This
+	 * field is optional and should only be implemented if the controller
+	 * has native support for memory like operations.
+	 */
+	const struct spi_controller_mem_ops *mem_ops;
+
+	/**
 	 * Set transfer speed.
 	 * This sets a new speed to be applied for next spi_xfer().
 	 * @bus:	The SPI bus
@@ -493,14 +516,15 @@ int spi_find_bus_and_cs(int busnum, int cs, struct udevice **busp,
  * device and slave device.
  *
  * If no such slave exists, and drv_name is not NULL, then a new slave device
- * is automatically bound on this chip select.
+ * is automatically bound on this chip select with requested speed and mode.
  *
- * Ths new slave device is probed ready for use with the given speed and mode.
+ * Ths new slave device is probed ready for use with the speed and mode
+ * from platdata when available or the requested values.
  *
  * @busnum:	SPI bus number
  * @cs:		Chip select to look for
- * @speed:	SPI speed to use for this slave
- * @mode:	SPI mode to use for this slave
+ * @speed:	SPI speed to use for this slave when not available in platdata
+ * @mode:	SPI mode to use for this slave when not available in platdata
  * @drv_name:	Name of driver to attach to this chip select
  * @dev_name:	Name of the new device thus created
  * @busp:	Returns bus device

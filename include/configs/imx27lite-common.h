@@ -1,10 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2010 Heiko Schocher <hs@denx.de>
  *
  * based on:
  * Copyright (C) 2009 Ilya Yanok <yanok@emcraft.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __IMX27LITE_COMMON_CONFIG_H
@@ -73,7 +72,6 @@
 /* memtest start address */
 #define CONFIG_SYS_MEMTEST_START	0xA0000000
 #define CONFIG_SYS_MEMTEST_END		0xA1000000	/* 16MB RAM test */
-#define CONFIG_NR_DRAM_BANKS	1		/* we have 1 bank of DRAM */
 #define PHYS_SDRAM_1		0xA0000000	/* DDR Start */
 #define PHYS_SDRAM_1_SIZE	0x08000000	/* DDR size 128MB */
 
@@ -82,17 +80,12 @@
  */
 #define CONFIG_MXC_UART
 #define CONFIG_MXC_UART_BASE	UART1_BASE
-#define CONFIG_CONS_INDEX	1		/* use UART0 for console */
 
 /*
  * Flash & Environment
  */
-#define CONFIG_FLASH_CFI_DRIVER
-#define CONFIG_SYS_FLASH_CFI
 /* Use buffered writes (~10x faster) */
-#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE	1
 /* Use hardware sector protection */
-#define CONFIG_SYS_FLASH_PROTECTION		1
 #define CONFIG_SYS_MAX_FLASH_BANKS	1	/* max number of flash banks */
 /* CS2 Base address */
 #define PHYS_FLASH_1			0xc0000000
@@ -112,13 +105,10 @@
  */
 #define CONFIG_FEC_MXC
 #define CONFIG_FEC_MXC_PHYADDR		0x1f
-#define CONFIG_MII
 
 /*
  * MTD
  */
-#define CONFIG_FLASH_CFI_MTD
-#define CONFIG_MTD_DEVICE
 
 /*
  * NAND
@@ -151,9 +141,9 @@
 		" console=ttymxc0,${baudrate}\0"			\
 	"addmtd=setenv bootargs ${bootargs} ${mtdparts}\0"		\
 	"addmisc=setenv bootargs ${bootargs}\0"				\
-	"u-boot=" __stringify(CONFIG_HOSTNAME) "/u-boot.bin\0"		\
+	"u-boot=" CONFIG_HOSTNAME "/u-boot.bin\0"		\
 	"kernel_addr_r=a0800000\0"					\
-	"bootfile=" __stringify(CONFIG_HOSTNAME) "/uImage\0"		\
+	"bootfile=" CONFIG_HOSTNAME "/uImage\0"		\
 	"rootpath=/opt/eldk-4.2-arm/arm\0"				\
 	"net_nfs=tftp ${kernel_addr_r} ${bootfile};"			\
 		"run nfsargs addip addtty addmtd addmisc;"		\

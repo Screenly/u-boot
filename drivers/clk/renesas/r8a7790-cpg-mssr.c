@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * r8a7790 Clock Pulse Generator / Module Standby and Software Reset
  *
@@ -6,10 +7,6 @@
  * Based on clk-rcar-gen2.c
  *
  * Copyright (C) 2013 Ideas On Board SPRL
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
  */
 
 #include <common.h>
@@ -40,7 +37,7 @@ enum clk_ids {
 	MOD_CLK_BASE
 };
 
-static const struct cpg_core_clk r8a7790_core_clks[] __initconst = {
+static const struct cpg_core_clk r8a7790_core_clks[] = {
 	/* External Clock Inputs */
 	DEF_INPUT("extal",     CLK_EXTAL),
 	DEF_INPUT("usb_extal", CLK_USB_EXTAL),
@@ -90,7 +87,7 @@ static const struct cpg_core_clk r8a7790_core_clks[] __initconst = {
 	DEF_DIV6P1("ssprs", R8A7790_CLK_SSPRS, CLK_PLL1_DIV2, 0x24c),
 };
 
-static const struct mssr_mod_clk r8a7790_mod_clks[] __initconst = {
+static const struct mssr_mod_clk r8a7790_mod_clks[] = {
 	DEF_MOD("msiof0",		   0,	R8A7790_CLK_MP),
 	DEF_MOD("vcp1",			 100,	R8A7790_CLK_ZS),
 	DEF_MOD("vcp0",			 101,	R8A7790_CLK_ZS),
@@ -139,6 +136,7 @@ static const struct mssr_mod_clk r8a7790_mod_clks[] __initconst = {
 	DEF_MOD("cmt1",			 329,	R8A7790_CLK_R),
 	DEF_MOD("usbhs-dmac0",		 330,	R8A7790_CLK_HP),
 	DEF_MOD("usbhs-dmac1",		 331,	R8A7790_CLK_HP),
+	DEF_MOD("rwdt",			 402,	R8A7790_CLK_R),
 	DEF_MOD("irqc",			 407,	R8A7790_CLK_CP),
 	DEF_MOD("intc-sys",		 408,	R8A7790_CLK_ZS),
 	DEF_MOD("audio-dmac1",		 501,	R8A7790_CLK_HP),
@@ -209,10 +207,6 @@ static const struct mssr_mod_clk r8a7790_mod_clks[] __initconst = {
 	DEF_MOD("scu-src0",		1031,	MOD_CLK_ID(1017)),
 };
 
-static const unsigned int r8a7790_crit_mod_clks[] __initconst = {
-	MOD_CLK_ID(408),	/* INTC-SYS (GIC) */
-};
-
 /*
  * CPG Clock Data
  */
@@ -235,7 +229,7 @@ static const unsigned int r8a7790_crit_mod_clks[] __initconst = {
 #define CPG_PLL_CONFIG_INDEX(md)	((((md) & BIT(14)) >> 12) | \
 					 (((md) & BIT(13)) >> 12) | \
 					 (((md) & BIT(19)) >> 19))
-static const struct rcar_gen2_cpg_pll_config cpg_pll_configs[8] __initconst = {
+static const struct rcar_gen2_cpg_pll_config cpg_pll_configs[8] = {
 	{ 1, 208, 106 }, { 1, 208,  88 }, { 1, 156,  80 }, { 1, 156,  66 },
 	{ 2, 240, 122 }, { 2, 240, 102 }, { 2, 208, 106 }, { 2, 208,  88 },
 };

@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2005
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
  * Copyright (C) 2006-2009 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <asm/mmu.h>
@@ -13,8 +12,6 @@
 #include <pci.h>
 #include <i2c.h>
 #include <asm/fsl_i2c.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 static struct pci_region pci1_regions[] = {
 	{
@@ -74,7 +71,7 @@ pci_init_board(void)
 	reg32 = 0xff000000;
 #endif
 	if (clk->spmr & SPMR_CKID) {
-		/* PCI Clock is half CONFIG_83XX_CLKIN so need to set up OCCR
+		/* PCI Clock is half CONFIG_SYS_CLK_FREQ so need to set up OCCR
 		 * fields accordingly */
 		reg32 |= (OCCR_PCI1CR | OCCR_PCI2CR);
 

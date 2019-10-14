@@ -1,12 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0+
 /**
  * Copyright (c) 2017 Google, Inc
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
-#include <asm/arch/bootrom.h>
-#include <asm/arch/boot_mode.h>
+#include <asm/arch-rockchip/bootrom.h>
+#include <asm/arch-rockchip/boot_mode.h>
 #include <asm/io.h>
 #include <asm/setjmp.h>
 #include <asm/system.h>

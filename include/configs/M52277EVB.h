@@ -1,10 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Configuation settings for the Freescale MCF52277 EVB board.
  *
  * Copyright (C) 2004-2007 Freescale Semiconductor, Inc.
  * TsiChung Liew (Tsi-Chung.Liew@freescale.com)
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -31,7 +30,7 @@
  */
 #define CONFIG_BOOTP_BOOTFILESIZE
 
-#define CONFIG_HOSTNAME			M52277EVB
+#define CONFIG_HOSTNAME			"M52277EVB"
 #define CONFIG_SYS_UBOOT_END		0x3FFFF
 #define	CONFIG_SYS_LOAD_ADDR2		0x40010007
 #ifdef CONFIG_SYS_STMICRO_BOOT
@@ -103,19 +102,7 @@
 
 /* DSPI and Serial Flash */
 #define CONFIG_CF_DSPI
-#define CONFIG_HARD_SPI
 #define CONFIG_SYS_SBFHDR_SIZE		0x7
-#ifdef CONFIG_CMD_SPI
-#	define CONFIG_SYS_DSPI_CS2
-
-#	define CONFIG_SYS_DSPI_CTAR0	(DSPI_CTAR_TRSZ(7) | \
-					 DSPI_CTAR_PCSSCK_1CLK | \
-					 DSPI_CTAR_PASC(0) | \
-					 DSPI_CTAR_PDT(0) | \
-					 DSPI_CTAR_CSSCK(0) | \
-					 DSPI_CTAR_ASC(0) | \
-					 DSPI_CTAR_DT(1))
-#endif
 
 /* Input, PCI, Flexbus, and VCO */
 #define CONFIG_EXTRA_CLOCK
@@ -179,9 +166,6 @@
  * Environment is not embedded in u-boot. First time runing may have env
  * crc error warning if there is no correct environment on the flash.
  */
-#ifdef CONFIG_CF_SBF
-#	define CONFIG_ENV_SPI_CS	2
-#endif
 #define CONFIG_ENV_OVERWRITE		1
 
 /*-----------------------------------------------------------------------
@@ -202,16 +186,12 @@
 #	define CONFIG_ENV_SECT_SIZE	0x8000
 #endif
 
-#define CONFIG_SYS_FLASH_CFI
 #ifdef CONFIG_SYS_FLASH_CFI
-#	define CONFIG_FLASH_CFI_DRIVER	1
-#	define CONFIG_SYS_FLASH_USE_BUFFER_WRITE	1
 #	define CONFIG_FLASH_SPANSION_S29WS_N	1
 #	define CONFIG_SYS_FLASH_SIZE		0x1000000	/* Max size that the board might have */
 #	define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
 #	define CONFIG_SYS_MAX_FLASH_BANKS	1	/* max number of memory banks */
 #	define CONFIG_SYS_MAX_FLASH_SECT	137	/* max number of sectors on one chip */
-#	define CONFIG_SYS_FLASH_PROTECTION	/* "Real" (hardware) sectors protection */
 #	define CONFIG_SYS_FLASH_CHECKSUM
 #	define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_CS0_BASE }
 #endif

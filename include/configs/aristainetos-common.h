@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2015
  * (C) Copyright 2014
@@ -7,8 +8,6 @@
  * Copyright (C) 2012 Freescale Semiconductor, Inc.
  *
  * Configuration settings for the Freescale i.MX6Q SabreSD board.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 #ifndef __ARISTAINETOS_COMMON_CONFIG_H
 #define __ARISTAINETOS_COMMON_CONFIG_H
@@ -27,14 +26,11 @@
 #define CONFIG_SYS_FSL_ESDHC_ADDR      0
 
 #define CONFIG_FEC_MXC
-#define CONFIG_MII
 #define IMX_FEC_BASE			ENET_BASE_ADDR
 #define CONFIG_ETHPRIME			"FEC"
 #define CONFIG_FEC_MXC_PHYADDR		0
 
 #define CONFIG_SPI_FLASH_MTD
-#define CONFIG_SF_DEFAULT_SPEED		20000000
-#define CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
 #define CONFIG_SYS_SPI_ST_ENABLE_WP_PIN
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -139,7 +135,6 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH	0x10800000
 
 /* Physical Memory Map */
-#define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
 
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
@@ -154,10 +149,6 @@
 /* Environment organization */
 #define CONFIG_ENV_SIZE			(12 * 1024)
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
-#define CONFIG_ENV_SPI_BUS		CONFIG_SF_DEFAULT_BUS
-#define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
-#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
-#define CONFIG_ENV_SPI_MODE		CONFIG_SF_DEFAULT_MODE
 #define CONFIG_ENV_SECT_SIZE		(0x010000)
 #define CONFIG_ENV_OFFSET		(0x0d0000)
 #define CONFIG_ENV_OFFSET_REDUND	(0x0e0000)
@@ -194,14 +185,8 @@
 #define CONFIG_MXC_USB_FLAGS	0
 
 /* UBI support */
-#define CONFIG_MTD_PARTITIONS
-#define CONFIG_MTD_DEVICE
-
-#define CONFIG_HW_WATCHDOG
-#define CONFIG_IMX_WATCHDOG
 
 /* Framebuffer */
-#define CONFIG_VIDEO_IPUV3
 /* check this console not needed, after test remove it */
 #define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_SPLASH_SCREEN
@@ -211,7 +196,6 @@
 #define CONFIG_VIDEO_BMP_LOGO
 #define CONFIG_IMX_VIDEO_SKIP
 
-#define CONFIG_PWM_IMX
 #define CONFIG_IMX6_PWM_PER_CLK	66000000
 
 #endif /* __ARISTAINETOS_COMMON_CONFIG_H */

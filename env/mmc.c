@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2008-2011 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /* #define DEBUG */
@@ -9,7 +8,8 @@
 #include <common.h>
 
 #include <command.h>
-#include <environment.h>
+#include <env.h>
+#include <env_internal.h>
 #include <fdtdec.h>
 #include <linux/stddef.h>
 #include <malloc.h>
@@ -156,19 +156,19 @@ static inline int mmc_set_env_part(struct mmc *mmc) {return 0; };
 static const char *init_mmc_for_env(struct mmc *mmc)
 {
 	if (!mmc)
-		return "!No MMC card found";
+		return "No MMC card found";
 
-#ifdef CONFIG_BLK
+#if CONFIG_IS_ENABLED(BLK)
 	struct udevice *dev;
 
 	if (blk_get_from_parent(mmc->dev, &dev))
-		return "!No block device";
+		return "No block device";
 #else
 	if (mmc_init(mmc))
-		return "!MMC init failed";
+		return "MMC init failed";
 #endif
 	if (mmc_set_env_part(mmc))
-		return "!MMC partition switch failed";
+		return "MMC partition switch failed";
 
 	return NULL;
 }
@@ -243,6 +243,54 @@ fini:
 	fini_mmc_for_env(mmc);
 	return ret;
 }
+
+#if defined(CONFIG_CMD_ERASEENV)
+static inline int erase_env(struct mmc *mmc, unsigned long size,
+			    unsigned long offset)
+{
+	uint blk_start, blk_cnt, n;
+	struct blk_desc *desc = mmc_get_blk_desc(mmc);
+
+	blk_start	= ALIGN(offset, mmc->write_bl_len) / mmc->write_bl_len;
+	blk_cnt		= ALIGN(size, mmc->write_bl_len) / mmc->write_bl_len;
+
+	n = blk_derase(desc, blk_start, blk_cnt);
+	printf("%d blocks erased: %s\n", n, (n == blk_cnt) ? "OK" : "ERROR");
+
+	return (n == blk_cnt) ? 0 : 1;
+}
+
+static int env_mmc_erase(void)
+{
+	int dev = mmc_get_env_dev();
+	struct mmc *mmc = find_mmc_device(dev);
+	int	ret, copy = 0;
+	u32	offset;
+	const char *errmsg;
+
+	errmsg = init_mmc_for_env(mmc);
+	if (errmsg) {
+		printf("%s\n", errmsg);
+		return 1;
+	}
+
+	if (mmc_get_env_addr(mmc, copy, &offset))
+		return CMD_RET_FAILURE;
+
+	ret = erase_env(mmc, CONFIG_ENV_SIZE, offset);
+
+#ifdef CONFIG_ENV_OFFSET_REDUND
+	copy = 1;
+
+	if (mmc_get_env_addr(mmc, copy, &offset))
+		return CMD_RET_FAILURE;
+
+	ret |= erase_env(mmc, CONFIG_ENV_SIZE, offset);
+#endif
+
+	return ret;
+}
+#endif /* CONFIG_CMD_ERASEENV */
 #endif /* CONFIG_CMD_SAVEENV && !CONFIG_SPL_BUILD */
 
 static inline int read_env(struct mmc *mmc, unsigned long size,
@@ -299,7 +347,7 @@ fini:
 	fini_mmc_for_env(mmc);
 err:
 	if (ret)
-		set_default_env(errmsg);
+		env_set_default(errmsg, 0);
 
 #endif
 	return ret;
@@ -340,7 +388,7 @@ fini:
 	fini_mmc_for_env(mmc);
 err:
 	if (ret)
-		set_default_env(errmsg);
+		env_set_default(errmsg, 0);
 #endif
 	return ret;
 }
@@ -352,5 +400,8 @@ U_BOOT_ENV_LOCATION(mmc) = {
 	.load		= env_mmc_load,
 #ifndef CONFIG_SPL_BUILD
 	.save		= env_save_ptr(env_mmc_save),
+#if defined(CONFIG_CMD_ERASEENV)
+	.erase		= env_mmc_erase,
+#endif
 #endif
 };

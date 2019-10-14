@@ -1,20 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2014 Marek Vasut <marex@denx.de>
  *
  * Command for en/de-crypting block of memory with AES-128-CBC cipher.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 #include <command.h>
-#include <environment.h>
 #include <uboot_aes.h>
 #include <malloc.h>
 #include <asm/byteorder.h>
 #include <linux/compiler.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 /**
  * do_aes() - Handle the "aes" command-line command

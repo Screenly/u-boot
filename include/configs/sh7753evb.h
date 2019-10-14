@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Configuation settings for the sh7753evb board
  *
  * Copyright (C) 2012 Renesas Solutions Corp.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __SH7753EVB_H
@@ -12,7 +11,6 @@
 #define CONFIG_CPU_SH7753	1
 
 #define CONFIG_DISPLAY_BOARDINFO
-#undef	CONFIG_SHOW_BOOT_PROGRESS
 
 /* MEMORY */
 #define SH7753EVB_SDRAM_BASE		(0x40000000)
@@ -27,7 +25,6 @@
 #define CONFIG_SYS_MEMTEST_START	(SH7753EVB_SDRAM_BASE)
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
 					 480 * 1024 * 1024)
-#undef	CONFIG_SYS_ALT_MEMTEST
 #undef	CONFIG_SYS_MEMTEST_SCRATCH
 #undef	CONFIG_SYS_LOADS_BAUD_CHANGE
 
@@ -61,12 +58,10 @@
 #define CONFIG_SH_SPI_BASE		0xfe002000
 
 /* MMCIF */
-#define CONFIG_SH_MMCIF			1
 #define CONFIG_SH_MMCIF_ADDR		0xffcb0000
 #define CONFIG_SH_MMCIF_CLK		48000000
 
 /* ENV setting */
-#define CONFIG_ENV_IS_EMBEDDED
 #define CONFIG_ENV_SECT_SIZE	(64 * 1024)
 #define CONFIG_ENV_ADDR		(0x00080000)
 #define CONFIG_ENV_OFFSET	(CONFIG_ENV_ADDR)
@@ -78,7 +73,5 @@
 
 /* Board Clock */
 #define CONFIG_SYS_CLK_FREQ	48000000
-#define CONFIG_SH_TMU_CLK_FREQ CONFIG_SYS_CLK_FREQ
 #define CONFIG_SH_SCIF_CLK_FREQ CONFIG_SYS_CLK_FREQ
-#define CONFIG_SYS_TMU_CLK_DIV	4
 #endif	/* __SH7753EVB_H */

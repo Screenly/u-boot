@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2010-2012
  * NVIDIA Corporation <www.nvidia.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __TEGRA_COMMON_POST_H
@@ -22,12 +21,14 @@
 #define CONFIG_SYS_NONCACHED_MEMORY	(1 << 20)	/* 1 MiB */
 
 #ifndef CONFIG_SPL_BUILD
+#ifndef BOOT_TARGET_DEVICES
 #define BOOT_TARGET_DEVICES(func) \
 	func(MMC, mmc, 1) \
 	func(MMC, mmc, 0) \
 	func(USB, usb, 0) \
 	func(PXE, pxe, na) \
 	func(DHCP, dhcp, na)
+#endif
 #include <config_distro_bootcmd.h>
 #else
 #define BOOTENV
@@ -41,7 +42,6 @@
 
 #ifdef CONFIG_USB_KEYBOARD
 #define STDIN_KBD_USB ",usbkbd"
-#define CONFIG_PREBOOT			"usb start"
 #else
 #define STDIN_KBD_USB ""
 #endif
@@ -110,14 +110,10 @@
 #ifdef CONFIG_SYS_I2C_TEGRA
 #undef CONFIG_SYS_I2C_TEGRA
 #endif
-#ifdef CONFIG_CMD_I2C
-#endif
 
 /* remove USB */
 #ifdef CONFIG_USB_EHCI_TEGRA
 #undef CONFIG_USB_EHCI_TEGRA
-#endif
-#ifdef CONFIG_CMD_USB
 #endif
 
 #endif /* CONFIG_SPL_BUILD */

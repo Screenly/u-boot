@@ -1,8 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2014 Wandboard
  * Author: Tungyi Lin <tungyilin1127@gmail.com>
  *         Richard Hu <hakahu@gmail.com>
- * SPDX-License-Identifier:     GPL-2.0+
  */
 
 #include <asm/arch/clock.h>
@@ -14,13 +14,11 @@
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/video.h>
 #include <mmc.h>
-#include <fsl_esdhc.h>
+#include <fsl_esdhc_imx.h>
 #include <asm/arch/crm_regs.h>
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
 #include <spl.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 #if defined(CONFIG_SPL_BUILD)
 #include <asm/arch/mx6-ddr.h>

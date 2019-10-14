@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2006-2008
  * Texas Instruments.
@@ -9,8 +10,6 @@
  * Thomas Weber <weber@corscience.de>
  *
  * Configuration settings for the Tricorder board.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -31,8 +30,6 @@
 #define V_OSCK				26000000 /* Clock output from T2 */
 #define V_SCLK				(V_OSCK >> 1)
 
-#define CONFIG_MISC_INIT_R
-
 #define CONFIG_CMDLINE_TAG		/* enable passing of ATAGs */
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_INITRD_TAG
@@ -49,9 +46,7 @@
 #define CONFIG_SYS_NS16550_CLK		48000000 /* 48MHz (APLL96/2) */
 
 /* select serial console configuration */
-#define CONFIG_CONS_INDEX		3
 #define CONFIG_SYS_NS16550_COM3		OMAP34XX_UART3
-#define CONFIG_SERIAL3			3
 #define CONFIG_SYS_BAUDRATE_TABLE	{4800, 9600, 19200, 38400, 57600,\
 					115200}
 
@@ -64,13 +59,8 @@
 #define CONFIG_SYS_EEPROM_BUS_NUM	1
 
 /* TWL4030 */
-#define CONFIG_TWL4030_LED
 
 /* Board NAND Info */
-#define CONFIG_MTD_DEVICE		/* needed for mtdparts commands */
-
-#define CONFIG_SYS_NAND_ADDR		NAND_BASE	/* physical address */
-							/* to access nand */
 #define CONFIG_SYS_NAND_BASE		NAND_BASE	/* physical address */
 							/* to access nand at */
 							/* CS0 */
@@ -80,8 +70,6 @@
 #define CONFIG_SYS_NAND_MAX_ECCPOS	56
 
 /* needed for ubi */
-#define CONFIG_MTD_DEVICE       /* needed for mtdparts commands */
-#define CONFIG_MTD_PARTITIONS
 
 /* Environment information (this is the common part) */
 
@@ -90,9 +78,7 @@
 
 /* environment placement (for NAND), is different for FLASHCARD but does not
  * harm there */
-#define CONFIG_ENV_OFFSET		0x120000    /* env start */
 #define CONFIG_ENV_OFFSET_REDUND	0x2A0000    /* redundant env start */
-#define CONFIG_ENV_SIZE			(16 << 10)  /* use 16KiB for env */
 #define CONFIG_ENV_RANGE		(384 << 10) /* allow badblocks in env */
 
 /* the loadaddr is the same as CONFIG_SYS_LOAD_ADDR, unfortunately the defiend
@@ -206,7 +192,6 @@
 #define CONFIG_SYS_PTV			2 /* Divisor: 2^(PTV+1) => 8 */
 
 /*  Physical Memory Map  */
-#define CONFIG_NR_DRAM_BANKS		2 /* CS1 may or may not be populated */
 #define PHYS_SDRAM_1			OMAP34XX_SDRC_CS0
 #define PHYS_SDRAM_2			OMAP34XX_SDRC_CS1
 
@@ -232,7 +217,6 @@
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME        "u-boot.img"
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION     1
 
-#define CONFIG_SPL_TEXT_BASE		0x40200000 /*CONFIG_SYS_SRAM_START*/
 #define CONFIG_SPL_MAX_SIZE		(SRAM_SCRATCH_SPACE_ADDR - \
 					 CONFIG_SPL_TEXT_BASE)
 
@@ -265,6 +249,5 @@
 #define CONFIG_SYS_SPL_MALLOC_START	0x80208000
 #define CONFIG_SYS_SPL_MALLOC_SIZE	0x100000	/* 1 MB */
 
-#define CONFIG_SYS_ALT_MEMTEST
 #define CONFIG_SYS_MEMTEST_SCRATCH	0x81000000
 #endif /* __CONFIG_H */

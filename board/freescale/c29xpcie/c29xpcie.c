@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2013 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -10,6 +9,7 @@
 #include <asm/cache.h>
 #include <asm/immap_85xx.h>
 #include <asm/io.h>
+#include <env.h>
 #include <miiphy.h>
 #include <linux/libfdt.h>
 #include <fdt_support.h>

@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright 2017 NXP
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __LS1088A_QDS_H
@@ -10,15 +9,22 @@
 #include "ls1088a_common.h"
 
 
-#define CONFIG_DISPLAY_BOARDINFO_LATE
-
-
 #ifndef __ASSEMBLY__
 unsigned long get_board_sys_clk(void);
 unsigned long get_board_ddr_clk(void);
 #endif
 
+#ifdef CONFIG_TFABOOT
+#define CONFIG_SYS_MMC_ENV_DEV		0
 
+#define CONFIG_MISC_INIT_R
+
+#define CONFIG_ENV_SIZE			0x20000
+#define CONFIG_ENV_OFFSET		0x500000
+#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + \
+					 CONFIG_ENV_OFFSET)
+#define CONFIG_ENV_SECT_SIZE		0x40000
+#else
 #if defined(CONFIG_QSPI_BOOT)
 #define CONFIG_ENV_SIZE			0x2000          /* 8KB */
 #define CONFIG_ENV_SECT_SIZE		0x40000
@@ -27,10 +33,10 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #define CONFIG_ENV_SIZE			0x2000
 #else
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x300000)
 #define CONFIG_ENV_SECT_SIZE		0x20000
 #define CONFIG_ENV_SIZE			0x20000
+#endif
 #endif
 
 #if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
@@ -41,6 +47,10 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_CLK_FREQ		100000000
 #define CONFIG_DDR_CLK_FREQ		100000000
 #else
+#define CONFIG_QIXIS_I2C_ACCESS
+#ifndef CONFIG_DM_I2C
+#define CONFIG_SYS_I2C_EARLY_INIT
+#endif
 #define CONFIG_SYS_CLK_FREQ		get_board_sys_clk()
 #define CONFIG_DDR_CLK_FREQ		get_board_ddr_clk()
 #endif
@@ -89,21 +99,19 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_NOR_CSOR	CSOR_NOR_ADM_SHIFT(12)
 #define CONFIG_SYS_NOR_FTIM0	(FTIM0_NOR_TACSE(0x4) | \
 				FTIM0_NOR_TEADC(0x5) | \
+				FTIM0_NOR_TAVDS(0x6) | \
 				FTIM0_NOR_TEAHC(0x5))
 #define CONFIG_SYS_NOR_FTIM1	(FTIM1_NOR_TACO(0x35) | \
-				FTIM1_NOR_TRAD_NOR(0x1a) |\
+				FTIM1_NOR_TRAD_NOR(0x1a) | \
 				FTIM1_NOR_TSEQRAD_NOR(0x13))
-#define CONFIG_SYS_NOR_FTIM2	(FTIM2_NOR_TCS(0x4) | \
-				FTIM2_NOR_TCH(0x4) | \
-				FTIM2_NOR_TWPH(0x0E) | \
+#define CONFIG_SYS_NOR_FTIM2	(FTIM2_NOR_TCS(0x8) | \
+				FTIM2_NOR_TCH(0x8) | \
+				FTIM2_NOR_TWPH(0xe) | \
 				FTIM2_NOR_TWP(0x1c))
 #define CONFIG_SYS_NOR_FTIM3	0x04000000
 #define CONFIG_SYS_IFC_CCR	0x01000000
 
 #ifndef SYS_NO_FLASH
-#define CONFIG_FLASH_CFI_DRIVER
-#define CONFIG_SYS_FLASH_CFI
-#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
 #define CONFIG_SYS_FLASH_QUIET_TEST
 #define CONFIG_FLASH_SHOW_PROGRESS	45 /* count down from 45/5: 9..1 */
 
@@ -197,7 +205,7 @@ unsigned long get_board_ddr_clk(void);
 					| CSPR_MSEL_GPCM \
 					| CSPR_V)
 
-#define CONFIG_SYS_FPGA_AMASK		IFC_AMASK(64*1024)
+#define SYS_FPGA_AMASK		IFC_AMASK(64 * 1024)
 #if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
 #define CONFIG_SYS_FPGA_CSOR		CSOR_GPCM_ADM_SHIFT(0)
 #else
@@ -214,6 +222,44 @@ unsigned long get_board_ddr_clk(void);
 					FTIM2_GPCM_TWP(0x3E))
 #define SYS_FPGA_CS_FTIM3	0x0
 
+#ifdef CONFIG_TFABOOT
+#define CONFIG_SYS_CSPR0_EXT		CONFIG_SYS_NOR0_CSPR_EXT
+#define CONFIG_SYS_CSPR0		CONFIG_SYS_NOR0_CSPR_EARLY
+#define CONFIG_SYS_CSPR0_FINAL		CONFIG_SYS_NOR0_CSPR
+#define CONFIG_SYS_AMASK0		CONFIG_SYS_NOR_AMASK
+#define CONFIG_SYS_CSOR0		CONFIG_SYS_NOR_CSOR
+#define CONFIG_SYS_CS0_FTIM0		CONFIG_SYS_NOR_FTIM0
+#define CONFIG_SYS_CS0_FTIM1		CONFIG_SYS_NOR_FTIM1
+#define CONFIG_SYS_CS0_FTIM2		CONFIG_SYS_NOR_FTIM2
+#define CONFIG_SYS_CS0_FTIM3		CONFIG_SYS_NOR_FTIM3
+#define CONFIG_SYS_CSPR1_EXT		CONFIG_SYS_NOR0_CSPR_EXT
+#define CONFIG_SYS_CSPR1		CONFIG_SYS_NOR1_CSPR_EARLY
+#define CONFIG_SYS_CSPR1_FINAL		CONFIG_SYS_NOR1_CSPR
+#define CONFIG_SYS_AMASK1		CONFIG_SYS_NOR_AMASK_EARLY
+#define CONFIG_SYS_AMASK1_FINAL		CONFIG_SYS_NOR_AMASK
+#define CONFIG_SYS_CSOR1		CONFIG_SYS_NOR_CSOR
+#define CONFIG_SYS_CS1_FTIM0		CONFIG_SYS_NOR_FTIM0
+#define CONFIG_SYS_CS1_FTIM1		CONFIG_SYS_NOR_FTIM1
+#define CONFIG_SYS_CS1_FTIM2		CONFIG_SYS_NOR_FTIM2
+#define CONFIG_SYS_CS1_FTIM3		CONFIG_SYS_NOR_FTIM3
+#define CONFIG_SYS_CSPR2_EXT		CONFIG_SYS_NAND_CSPR_EXT
+#define CONFIG_SYS_CSPR2		CONFIG_SYS_NAND_CSPR
+#define CONFIG_SYS_AMASK2		CONFIG_SYS_NAND_AMASK
+#define CONFIG_SYS_CSOR2		CONFIG_SYS_NAND_CSOR
+#define CONFIG_SYS_CS2_FTIM0		CONFIG_SYS_NAND_FTIM0
+#define CONFIG_SYS_CS2_FTIM1		CONFIG_SYS_NAND_FTIM1
+#define CONFIG_SYS_CS2_FTIM2		CONFIG_SYS_NAND_FTIM2
+#define CONFIG_SYS_CS2_FTIM3		CONFIG_SYS_NAND_FTIM3
+#define CONFIG_SYS_CSPR3_EXT		CONFIG_SYS_FPGA_CSPR_EXT
+#define CONFIG_SYS_CSPR3		CONFIG_SYS_FPGA_CSPR
+#define CONFIG_SYS_CSPR3_FINAL		SYS_FPGA_CSPR_FINAL
+#define CONFIG_SYS_AMASK3		SYS_FPGA_AMASK
+#define CONFIG_SYS_CSOR3		CONFIG_SYS_FPGA_CSOR
+#define CONFIG_SYS_CS3_FTIM0		SYS_FPGA_CS_FTIM0
+#define CONFIG_SYS_CS3_FTIM1		SYS_FPGA_CS_FTIM1
+#define CONFIG_SYS_CS3_FTIM2		SYS_FPGA_CS_FTIM2
+#define CONFIG_SYS_CS3_FTIM3		SYS_FPGA_CS_FTIM3
+#else
 #if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
 #define CONFIG_SYS_CSPR0_EXT		CONFIG_SYS_NAND_CSPR_EXT
 #define CONFIG_SYS_CSPR0		CONFIG_SYS_NAND_CSPR
@@ -226,7 +272,7 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_CSPR2_EXT		CONFIG_SYS_FPGA_CSPR_EXT
 #define CONFIG_SYS_CSPR2		CONFIG_SYS_FPGA_CSPR
 #define CONFIG_SYS_CSPR2_FINAL		SYS_FPGA_CSPR_FINAL
-#define CONFIG_SYS_AMASK2		CONFIG_SYS_FPGA_AMASK
+#define CONFIG_SYS_AMASK2		SYS_FPGA_AMASK
 #define CONFIG_SYS_CSOR2		CONFIG_SYS_FPGA_CSOR
 #define CONFIG_SYS_CS2_FTIM0		SYS_FPGA_CS_FTIM0
 #define CONFIG_SYS_CS2_FTIM1		SYS_FPGA_CS_FTIM1
@@ -262,13 +308,14 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_CS2_FTIM3		CONFIG_SYS_NAND_FTIM3
 #define CONFIG_SYS_CSPR3_EXT		CONFIG_SYS_FPGA_CSPR_EXT
 #define CONFIG_SYS_CSPR3		CONFIG_SYS_FPGA_CSPR
-#define CONFIG_SYS_CSPR3_FINAL		CONFIG_SYS_FPGA_CSPR_FINAL
-#define CONFIG_SYS_AMASK3		CONFIG_SYS_FPGA_AMASK
+#define CONFIG_SYS_CSPR3_FINAL		SYS_FPGA_CSPR_FINAL
+#define CONFIG_SYS_AMASK3		SYS_FPGA_AMASK
 #define CONFIG_SYS_CSOR3		CONFIG_SYS_FPGA_CSOR
-#define CONFIG_SYS_CS3_FTIM0		CONFIG_SYS_FPGA_CS_FTIM0
-#define CONFIG_SYS_CS3_FTIM1		CONFIG_SYS_FPGA_CS_FTIM1
-#define CONFIG_SYS_CS3_FTIM2		CONFIG_SYS_FPGA_CS_FTIM2
-#define CONFIG_SYS_CS3_FTIM3		CONFIG_SYS_FPGA_CS_FTIM3
+#define CONFIG_SYS_CS3_FTIM0		SYS_FPGA_CS_FTIM0
+#define CONFIG_SYS_CS3_FTIM1		SYS_FPGA_CS_FTIM1
+#define CONFIG_SYS_CS3_FTIM2		SYS_FPGA_CS_FTIM2
+#define CONFIG_SYS_CS3_FTIM3		SYS_FPGA_CS_FTIM3
+#endif
 #endif
 
 #define CONFIG_SYS_LS_MC_BOOT_TIMEOUT_MS 5000
@@ -314,9 +361,7 @@ unsigned long get_board_ddr_clk(void);
 * RTC configuration
 */
 #define RTC
-#define CONFIG_RTC_PCF8563 1
 #define CONFIG_SYS_I2C_RTC_ADDR         0x51  /* Channel 3*/
-#define CONFIG_CMD_DATE
 
 /* EEPROM */
 #define CONFIG_ID_EEPROM
@@ -328,8 +373,8 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	5
 
 /* QSPI device */
-#if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
-#define CONFIG_FSL_QSPI
+#if defined(CONFIG_TFABOOT) || \
+	defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT_QSPI)
 #define FSL_QSPI_FLASH_SIZE		(1 << 26)
 #define FSL_QSPI_FLASH_NUM		2
 
@@ -339,14 +384,12 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SPI_FLASH_STMICRO
 #define CONFIG_SPI_FLASH_SST
 #define CONFIG_SPI_FLASH_EON
-#if !defined(CONFIG_QSPI_BOOT) && !defined(CONFIG_SD_BOOT_QSPI)
-#define CONFIG_SF_DEFAULT_BUS		1
-#define CONFIG_SF_DEFAULT_CS		0
+#if !defined(CONFIG_TFABOOT) && \
+	!defined(CONFIG_QSPI_BOOT) && !defined(CONFIG_SD_BOOT_QSPI)
 #endif
 #endif
 
 #define CONFIG_CMD_MEMINFO
-#define CONFIG_CMD_MEMTEST
 #define CONFIG_SYS_MEMTEST_START	0x80000000
 #define CONFIG_SYS_MEMTEST_END		0x9fffffff
 
@@ -359,7 +402,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_FSL_MEMAC
 
 /*  MMC  */
-#define CONFIG_FSL_ESDHC
 #define CONFIG_SYS_FSL_MMC_HAS_CAPBLT_VS33
 #define CONFIG_ESDHC_DETECT_QUIRK ((readb(QIXIS_BASE + QIXIS_STAT_PRES1) & \
 	QIXIS_SDID_MASK) != QIXIS_ESDHC_NO_ADAPTER)
@@ -385,6 +427,50 @@ unsigned long get_board_ddr_clk(void);
 	"fsl_mc start mc 0xa0a00000 0xa0e00000\0"			\
 	"mcmemsize=0x70000000 \0"
 #else /* if !(CONFIG_SECURE_BOOT) */
+#ifdef CONFIG_TFABOOT
+#define QSPI_MC_INIT_CMD				\
+	"sf probe 0:0;sf read 0x80000000 0xA00000 0x100000;"	\
+	"sf read 0x80100000 0xE00000 0x100000;" \
+	"fsl_mc start mc 0x80000000 0x80100000\0"
+#define SD_MC_INIT_CMD				\
+	"mmcinfo;mmc read 0x80000000 0x5000 0x800;"  \
+	"mmc read 0x80100000 0x7000 0x800;" \
+	"fsl_mc start mc 0x80000000 0x80100000\0"
+#define IFC_MC_INIT_CMD				\
+	"fsl_mc start mc 0x580A00000 0x580E00000\0"
+
+#undef CONFIG_EXTRA_ENV_SETTINGS
+#define CONFIG_EXTRA_ENV_SETTINGS		\
+	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
+	"loadaddr=0x90100000\0"			\
+	"kernel_addr=0x100000\0"		\
+	"kernel_addr_sd=0x800\0"                \
+	"ramdisk_addr=0x800000\0"		\
+	"ramdisk_size=0x2000000\0"		\
+	"fdt_high=0xa0000000\0"			\
+	"initrd_high=0xffffffffffffffff\0"	\
+	"kernel_start=0x1000000\0"		\
+	"kernel_start_sd=0x8000\0"              \
+	"kernel_load=0xa0000000\0"		\
+	"kernel_size=0x2800000\0"		\
+	"kernel_size_sd=0x14000\0"               \
+	"mcinitcmd=sf probe 0:0;sf read 0x80000000 0xA00000 0x100000;"	\
+	"sf read 0x80100000 0xE00000 0x100000;" \
+	"fsl_mc start mc 0x80000000 0x80100000\0"	\
+	"mcmemsize=0x70000000 \0"
+#define QSPI_NOR_BOOTCOMMAND	"sf probe 0:0;" \
+				"sf read 0x80001000 0xd00000 0x100000;"\
+				" fsl_mc lazyapply dpl 0x80001000 &&" \
+				" sf read $kernel_load $kernel_start" \
+				" $kernel_size && bootm $kernel_load"
+#define SD_BOOTCOMMAND		"mmcinfo;mmc read 0x80001000 0x6800 0x800;"\
+				" fsl_mc lazyapply dpl 0x80001000 &&" \
+				" mmc read $kernel_load $kernel_start_sd" \
+				" $kernel_size_sd && bootm $kernel_load"
+#define IFC_NOR_BOOTCOMMAND	"fsl_mc lazyapply dpl 0x580d00000 &&" \
+				" cp.b $kernel_start $kernel_load" \
+				" $kernel_size && bootm $kernel_load"
+#else
 #if defined(CONFIG_QSPI_BOOT)
 #undef CONFIG_EXTRA_ENV_SETTINGS
 #define CONFIG_EXTRA_ENV_SETTINGS		\
@@ -435,6 +521,7 @@ unsigned long get_board_ddr_clk(void);
 	"mcinitcmd=fsl_mc start mc 0x580A00000 0x580E00000\0"	\
 	"mcmemsize=0x70000000 \0"
 #endif
+#endif /* CONFIG_TFABOOT */
 #endif /* CONFIG_SECURE_BOOT */
 
 #ifdef CONFIG_FSL_MC_ENET
@@ -468,7 +555,6 @@ unsigned long get_board_ddr_clk(void);
 #define XQSGMII_CARD_PHY4_PORT2_ADDR 0xe
 #define XQSGMII_CARD_PHY4_PORT3_ADDR 0xf
 
-#define CONFIG_MII		/* MII PHY management */
 #define CONFIG_ETHPRIME		"DPMAC1@xgmii"
 #define CONFIG_PHY_GIGE		/* Include GbE speed/duplex detection */
 

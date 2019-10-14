@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2015, STMicroelectronics - All Rights Reserved
  * Author: Maxime Coquelin <mcoquelin.stm32@gmail.com> for STMicroelectronics.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /dts-v1/;
@@ -73,7 +72,6 @@
 
 	gpio_keys {
 		compatible = "gpio-keys";
-		#address-cells = <1>;
 		#size-cells = <0>;
 		autorepeat;
 		button@0 {
@@ -224,12 +222,12 @@
 &sdio {
 	status = "okay";
 	vmmc-supply = <&mmc_vcard>;
-	cd-gpios = <&stmpegpio 15 GPIO_ACTIVE_HIGH>;
-	cd-inverted;
+	cd-gpios = <&stmpegpio 15 GPIO_ACTIVE_LOW>;
 	pinctrl-names = "default", "opendrain";
 	pinctrl-0 = <&sdio_pins>;
 	pinctrl-1 = <&sdio_pins_od>;
 	bus-width = <4>;
+	max-frequency = <14000000>;
 };
 
 &timers1 {

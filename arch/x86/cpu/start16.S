@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  *  U-Boot - x86 Startup Code
  *
@@ -6,8 +7,6 @@
  *
  * (C) Copyright 2002,2003
  * Daniel Engström, Omicron Ceti AB, <daniel@omicron.se>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <asm/global_data.h>
@@ -23,9 +22,6 @@
 start16:
 	/* Save BIST */
 	movl	%eax, %ecx
-
-	/* Set the Cold Boot / Hard Reset flag */
-	movl	$GD_FLG_COLD_BOOT, %ebx
 
 	xorl	%eax, %eax
 	movl	%eax, %cr3	/* Invalidate TLB */

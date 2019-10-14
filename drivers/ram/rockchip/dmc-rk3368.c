@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * (C) Copyright 2017 Theobroma Systems Design und Consulting GmbH
- *
- * SPDX-License-Identifier:	GPL-2.0
  */
 
 #include <common.h>
@@ -13,14 +12,12 @@
 #include <regmap.h>
 #include <syscon.h>
 #include <asm/io.h>
-#include <asm/arch/clock.h>
-#include <asm/arch/cru_rk3368.h>
-#include <asm/arch/grf_rk3368.h>
-#include <asm/arch/ddr_rk3368.h>
-#include <asm/arch/sdram.h>
-#include <asm/arch/sdram_common.h>
-
-DECLARE_GLOBAL_DATA_PTR;
+#include <asm/arch-rockchip/clock.h>
+#include <asm/arch-rockchip/cru_rk3368.h>
+#include <asm/arch-rockchip/grf_rk3368.h>
+#include <asm/arch-rockchip/ddr_rk3368.h>
+#include <asm/arch-rockchip/sdram.h>
+#include <asm/arch-rockchip/sdram_common.h>
 
 struct dram_info {
 	struct ram_info info;
@@ -845,7 +842,11 @@ static int setup_sdram(struct udevice *dev)
 	move_to_access_state(pctl);
 
 	/* TODO(prt): could detect rank in training... */
+#ifdef CONFIG_TARGET_EVB_PX5
+	params->chan.rank = 1;
+#else
 	params->chan.rank = 2;
+#endif
 	/* TODO(prt): bus width is not auto-detected (yet)... */
 	params->chan.bw = 2;  /* 32bit wide bus */
 	params->chan.dbw = params->chan.dbw;  /* 32bit wide bus */
@@ -880,7 +881,7 @@ static int rk3368_dmc_ofdata_to_platdata(struct udevice *dev)
 #if !CONFIG_IS_ENABLED(OF_PLATDATA)
 	struct rk3368_sdram_params *plat = dev_get_platdata(dev);
 
-	ret = regmap_init_mem(dev, &plat->map);
+	ret = regmap_init_mem(dev_ofnode(dev), &plat->map);
 	if (ret)
 		return ret;
 #endif

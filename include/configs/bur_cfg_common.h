@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * bur_cfg_common.h
  *
@@ -5,8 +6,6 @@
  *
  * Copyright (C) 2016 Hannes Schmelzer <oe5hpm@oevsv.at> -
  * Bernecker & Rainer Industrieelektronik GmbH - http://www.br-automation.com
- *
- * SPDX-License-Identifier:        GPL-2.0+
  */
 
 #ifndef __BUR_CFG_COMMON_H__
@@ -23,8 +22,6 @@
 "setcurs 1 9; lcdputs myip; setcurs 10 9; lcdputs ${ipaddr};" \
 "setcurs 1 10;lcdputs serverip; setcurs 10 10; lcdputs ${serverip};" \
 "setenv stdout nc;setenv stdin nc;setenv stderr nc\0"
-
-#define CONFIG_PREBOOT			"run cfgscr; run brdefaultip"
 
 /* Network defines */
 #define CONFIG_BOOTP_SEND_HOSTNAME

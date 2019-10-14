@@ -1,9 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2016 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 #include <asm/io.h>
+#include <env.h>
 #include <fsl_qe.h>	/* For struct qe_firmware */
 
 #ifdef CONFIG_SYS_DPAA_FMAN

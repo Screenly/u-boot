@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2002
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /* for now: just dummy functions to satisfy the linker */
@@ -78,6 +77,7 @@ void noncached_init(void)
 	phys_addr_t start, end;
 	size_t size;
 
+	/* If this calculation changes, update board_f.c:reserve_noncached() */
 	end = ALIGN(mem_malloc_start, MMU_SECTION_SIZE) - MMU_SECTION_SIZE;
 	size = ALIGN(CONFIG_SYS_NONCACHED_MEMORY, MMU_SECTION_SIZE);
 	start = end - size;
@@ -88,7 +88,7 @@ void noncached_init(void)
 	noncached_end = end;
 	noncached_next = start;
 
-#ifndef CONFIG_SYS_DCACHE_OFF
+#if !CONFIG_IS_ENABLED(SYS_DCACHE_OFF)
 	mmu_set_region_dcache_behaviour(noncached_start, size, DCACHE_OFF);
 #endif
 }

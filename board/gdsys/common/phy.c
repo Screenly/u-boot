@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2014
  * Dirk Eibach,  Guntermann & Drunck GmbH, dirk.eibach@gdsys.cc
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -46,8 +45,6 @@ struct mii_setupcmd fixup_88e1518[] = {
 	{ MIICMD_SET, 16, 0x214d },
 	{ MIICMD_SET, 17, 0xcc0c },
 	{ MIICMD_SET, 16, 0x2159 },
-	{ MIICMD_SET, 22, 0x00fb },
-	{ MIICMD_SET,  7, 0xc00d },
 	{ MIICMD_SET, 22, 0x0000 },
 };
 

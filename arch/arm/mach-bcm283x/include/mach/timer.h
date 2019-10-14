@@ -1,17 +1,12 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
  * (C) Copyright 2012,2015 Stephen Warren
- *
- * SPDX-License-Identifier:	GPL-2.0
  */
 
 #ifndef _BCM2835_TIMER_H
 #define _BCM2835_TIMER_H
 
-#ifndef CONFIG_BCM2835
-#define BCM2835_TIMER_PHYSADDR	0x3f003000
-#else
-#define BCM2835_TIMER_PHYSADDR	0x20003000
-#endif
+#define BCM2835_TIMER_PHYSADDR	(CONFIG_BCM283x_BASE + 0x00003000)
 
 #define BCM2835_TIMER_CS_M3	(1 << 3)
 #define BCM2835_TIMER_CS_M2	(1 << 2)

@@ -1,9 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2010
  * Dirk Eibach,  Guntermann & Drunck GmbH, dirk.eibach@gdsys.cc
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
+
+#ifdef CONFIG_GDSYS_LEGACY_DRIVERS
 
 #include <common.h>
 #include <i2c.h>
@@ -498,3 +499,5 @@ U_BOOT_CMD(
 	"size_x(max. " __stringify(MAX_X_CHARS)
 	") size_y(max. " __stringify(MAX_Y_CHARS) ")\n"
 );
+
+#endif /* CONFIG_GDSYS_LEGACY_DRIVERS */

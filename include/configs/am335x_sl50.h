@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * am335x_sl50.h
  *
  * Copyright (C) 2015 Toby Churchill Ltd - http://www.toby-churchill.com/
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_AM335X_EVM_H
@@ -22,11 +21,6 @@
 /* Clock Defines */
 #define V_OSCK				24000000  /* Clock output from T2 */
 #define V_SCLK				(V_OSCK)
-
-/* Always 128 KiB env size */
-#define CONFIG_ENV_SIZE			(128 << 10)
-
-#define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 
 #ifndef CONFIG_SPL_BUILD
 

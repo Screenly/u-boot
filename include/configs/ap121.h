@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2015-2016 Wills Wang <wills.wang@live.com>
- *
- * SPDX-License-Identifier: GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -31,7 +30,6 @@
 					"mtdparts default;" \
 					"bootm 0x9f650000"
 
-#define CONFIG_ENV_SPI_MAX_HZ           25000000
 #define CONFIG_ENV_OFFSET               0x40000
 #define CONFIG_ENV_SECT_SIZE            0x10000
 #define CONFIG_ENV_SIZE                 0x10000
@@ -43,6 +41,5 @@
  */
 #define CONFIG_SYS_MEMTEST_START        0x80100000
 #define CONFIG_SYS_MEMTEST_END          0x83f00000
-#define CONFIG_CMD_MEMTEST
 
 #endif  /* __CONFIG_H */

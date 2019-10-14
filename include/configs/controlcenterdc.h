@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2014 Stefan Roese <sr@denx.de>
  * Copyright (C) 2016 Mario Six <mario.six@gdsys.cc>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _CONFIG_CONTROLCENTERDC_H
@@ -14,9 +13,7 @@
 #define CONFIG_CUSTOMER_BOARD_SUPPORT
 
 #define CONFIG_SKIP_LOWLEVEL_INIT	/* disable board lowlevel_init */
-#define CONFIG_DISPLAY_BOARDINFO_LATE
 #define CONFIG_BOARD_LATE_INIT
-#define CONFIG_LAST_STAGE_INIT
 
 /*
  * TEXT_BASE needs to be below 16MiB, since this area is scrubbed
@@ -27,17 +24,6 @@
 #define CONFIG_SYS_TCLK		250000000	/* 250MHz */
 
 #define CONFIG_LOADADDR 		1000000
-
-/*
- * Commands configuration
- */
-#define CONFIG_CMD_I2C
-#define CONFIG_CMD_SPI
-
-/* SPI NOR flash default params, used by sf commands */
-#define CONFIG_SF_DEFAULT_BUS		1
-#define CONFIG_SF_DEFAULT_SPEED		1000000
-#define CONFIG_SF_DEFAULT_MODE		SPI_MODE_3
 
 /*
  * SDIO/MMC Card Configuration
@@ -57,23 +43,16 @@
 #define CONFIG_EHCI_IS_TDI
 
 /* Environment in SPI NOR flash */
-#define CONFIG_ENV_SPI_BUS		1
 #define CONFIG_ENV_OFFSET		(1 << 20) /* 1MiB in */
 #define CONFIG_ENV_SIZE			(64 << 10) /* 64KiB */
 #define CONFIG_ENV_SECT_SIZE		(256 << 10) /* 256KiB sectors */
 
-#define CONFIG_PHY_MARVELL		/* there is a marvell phy */
 #define PHY_ANEG_TIMEOUT	8000	/* PHY needs a longer aneg time */
 
 /* PCIe support */
 #ifndef CONFIG_SPL_BUILD
-#define CONFIG_PCI
-#define CONFIG_PCI_MVEBU
-#define CONFIG_PCI_PNP
 #define CONFIG_PCI_SCAN_SHOW
 #endif
-
-#define CONFIG_SYS_ALT_MEMTEST
 
 /*
  * Software (bit-bang) MII driver configuration
@@ -97,10 +76,8 @@
 #define CONFIG_SPL_SIZE			(160 << 10)
 
 #if defined(CONFIG_SECURED_MODE_IMAGE)
-#define CONFIG_SPL_TEXT_BASE		0x40002614
 #define CONFIG_SPL_MAX_SIZE		(CONFIG_SPL_SIZE - 0x2614)
 #else
-#define CONFIG_SPL_TEXT_BASE		0x40000030
 #define CONFIG_SPL_MAX_SIZE		(CONFIG_SPL_SIZE - 0x30)
 #endif
 
@@ -116,13 +93,10 @@
 
 #define CONFIG_SPL_LIBCOMMON_SUPPORT
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
-#define CONFIG_SPL_SERIAL_SUPPORT
 #define CONFIG_SPL_I2C_SUPPORT
 
 #if CONFIG_SPL_BOOT_DEVICE == SPL_BOOT_SPI_NOR_FLASH
 /* SPL related SPI defines */
-#define CONFIG_SPL_SPI_LOAD
-#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x30000
 #define CONFIG_SYS_U_BOOT_OFFS		CONFIG_SYS_SPI_U_BOOT_OFFS
 #endif
 
@@ -145,11 +119,9 @@
 
 #define CONFIG_BAUDRATE 115200
 
-#define CONFIG_HOSTNAME		ccdc
+#define CONFIG_HOSTNAME		"ccdc"
 #define CONFIG_ROOTPATH		"/opt/nfsroot"
 #define CONFIG_BOOTFILE		"ccdc.img"
-
-#define CONFIG_PREBOOT		/* enable preboot variable */
 
 #define CONFIG_EXTRA_ENV_SETTINGS						\
 	"netdev=eth1\0"						\

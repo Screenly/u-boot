@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2015 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  *
  * The file use ls102xa/timer.c as a reference.
  */
@@ -56,6 +55,7 @@ static inline unsigned long long us_to_tick(unsigned long long usec)
 	return usec;
 }
 
+#ifndef CONFIG_SKIP_LOWLEVEL_INIT
 int timer_init(void)
 {
 	struct sctr_regs *sctr = (struct sctr_regs *)SCTR_BASE_ADDR;
@@ -77,6 +77,7 @@ int timer_init(void)
 
 	return 0;
 }
+#endif
 
 unsigned long long get_ticks(void)
 {
@@ -90,14 +91,9 @@ unsigned long long get_ticks(void)
 	return now;
 }
 
-ulong get_timer_masked(void)
-{
-	return tick_to_time(get_ticks());
-}
-
 ulong get_timer(ulong base)
 {
-	return get_timer_masked() - base;
+	return tick_to_time(get_ticks()) - base;
 }
 
 void __udelay(unsigned long usec)

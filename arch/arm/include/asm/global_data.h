@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2002-2010
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef	__ASM_GBL_DATA_H
@@ -10,7 +9,7 @@
 
 /* Architecture-specific global data */
 struct arch_global_data {
-#if defined(CONFIG_FSL_ESDHC)
+#if defined(CONFIG_FSL_ESDHC) || defined(CONFIG_FSL_ESDHC_IMX)
 	u32 sdhc_clk;
 #endif
 
@@ -36,7 +35,7 @@ struct arch_global_data {
 	unsigned int tbl;
 	unsigned long lastinc;
 	unsigned long long timer_reset_value;
-#if !(defined(CONFIG_SYS_ICACHE_OFF) && defined(CONFIG_SYS_DCACHE_OFF))
+#if !(CONFIG_IS_ENABLED(SYS_ICACHE_OFF) && CONFIG_IS_ENABLED(SYS_DCACHE_OFF))
 	unsigned long tlb_addr;
 	unsigned long tlb_size;
 #if defined(CONFIG_ARM64)
@@ -74,6 +73,10 @@ struct arch_global_data {
 #endif
 #if defined(CONFIG_FSL_LSCH3) && defined(CONFIG_SYS_FSL_HAS_DP_DDR)
 	unsigned long mem2_clk;
+#endif
+
+#ifdef CONFIG_ARCH_IMX8
+	struct udevice *scu_dev;
 #endif
 };
 

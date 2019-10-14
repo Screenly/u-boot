@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2007
  * DENX Software Engineering, Anatolij Gustschin, agust@denx.de
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /*
@@ -13,6 +12,7 @@
 #include <common.h>
 
 #include <asm/io.h>
+#include <env.h>
 #include <pci.h>
 #include <video_fb.h>
 #include "videomodes.h"

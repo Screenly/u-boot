@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * board.c
  *
@@ -6,15 +7,13 @@
  * Copyright (C) 2018, EETS GmbH, http://www.eets.ch/
  *
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
- *
- * SPDX-License-Identifier: GPL-2.0+
  */
 
 #include <common.h>
+#include <env.h>
 #include <errno.h>
 #include <spl.h>
 #include <i2c.h>
-#include <environment.h>
 #include <watchdog.h>
 #include <debug_uart.h>
 #include <dm/ofnode.h>
@@ -210,7 +209,6 @@ void am33xx_spl_board_init(void)
 const struct dpll_params *get_dpll_ddr_params(void)
 {
 	enable_i2c0_pin_mux();
-	i2c_init(CONFIG_SYS_OMAP24_I2C_SPEED, CONFIG_SYS_OMAP24_I2C_SLAVE);
 
 	return &dpll_ddr;
 }

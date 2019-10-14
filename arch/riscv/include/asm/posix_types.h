@@ -37,10 +37,10 @@ typedef unsigned short		__kernel_gid_t;
 #ifdef __GNUC__
 typedef __SIZE_TYPE__		__kernel_size_t;
 #else
-typedef unsigned int		__kernel_size_t;
+typedef unsigned long		__kernel_size_t;
 #endif
-typedef int			__kernel_ssize_t;
-typedef int			__kernel_ptrdiff_t;
+typedef long			__kernel_ssize_t;
+typedef long			__kernel_ptrdiff_t;
 typedef long			__kernel_time_t;
 typedef long			__kernel_suseconds_t;
 typedef long			__kernel_clock_t;
@@ -69,19 +69,23 @@ typedef struct {
 #if defined(__KERNEL__) || !defined(__GLIBC__) || (__GLIBC__ < 2)
 
 #undef	__FD_SET
-#define __FD_SET(fd, fdsetp) \
+#define __FD_SET(_fd, fdsetp) \
+	typeof(_fd) (fd) = (_fd); \
 	(((fd_set *)fdsetp)->fds_bits[fd >> 5] |= (1 << (fd & 31)))
 
 #undef	__FD_CLR
-#define __FD_CLR(fd, fdsetp) \
+#define __FD_CLR(_fd, fdsetp) \
+	typeof(_fd) (fd) = (_fd); \
 	(((fd_set *)fdsetp)->fds_bits[fd >> 5] &= ~(1 << (fd & 31)))
 
 #undef	__FD_ISSET
-#define __FD_ISSET(fd, fdsetp) \
+#define __FD_ISSET(_fd, fdsetp) \
+	typeof(_fd) (fd) = (_fd); \
 	((((fd_set *)fdsetp)->fds_bits[fd >> 5] & (1 << (fd & 31))) != 0)
 
 #undef	__FD_ZERO
-#define __FD_ZERO(fdsetp) \
+#define __FD_ZERO(_fdsetp) \
+	typeof(_fdsetp) (fd) = (_fdsetp); \
 	(memset(fdsetp, 0, sizeof(*(fd_set *)fdsetp)))
 
 #endif

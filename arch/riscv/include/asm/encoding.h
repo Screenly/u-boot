@@ -1,12 +1,19 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (c) 2017 Microsemi Corporation.
  * Padmarao Begari, Microsemi Corporation <padmarao.begari@microsemi.com>
- *
- * SPDX-License-Identifier: GPL-2.0+
  */
 
 #ifndef RISCV_CSR_ENCODING_H
 #define RISCV_CSR_ENCODING_H
+
+#include <asm/csr.h>
+
+#if CONFIG_IS_ENABLED(RISCV_SMODE)
+#define MODE_PREFIX(__suffix)	s##__suffix
+#else
+#define MODE_PREFIX(__suffix)	m##__suffix
+#endif
 
 #define MSTATUS_UIE	0x00000001
 #define MSTATUS_SIE	0x00000002
@@ -44,13 +51,10 @@
 #define SSTATUS64_SD	0x8000000000000000
 
 #define MIP_SSIP	BIT(IRQ_S_SOFT)
-#define MIP_HSIP	BIT(IRQ_H_SOFT)
 #define MIP_MSIP	BIT(IRQ_M_SOFT)
 #define MIP_STIP	BIT(IRQ_S_TIMER)
-#define MIP_HTIP	BIT(IRQ_H_TIMER)
 #define MIP_MTIP	BIT(IRQ_M_TIMER)
 #define MIP_SEIP	BIT(IRQ_S_EXT)
-#define MIP_HEIP	BIT(IRQ_H_EXT)
 #define MIP_MEIP	BIT(IRQ_M_EXT)
 
 #define SIP_SSIP	MIP_SSIP
@@ -68,17 +72,20 @@
 #define VM_SV39		9
 #define VM_SV48		10
 
-#define IRQ_S_SOFT	1
-#define IRQ_H_SOFT	2
-#define IRQ_M_SOFT	3
-#define IRQ_S_TIMER	5
-#define IRQ_H_TIMER	6
-#define IRQ_M_TIMER	7
-#define IRQ_S_EXT	9
-#define IRQ_H_EXT	10
-#define IRQ_M_EXT	11
-#define IRQ_COP		12
-#define IRQ_HOST	13
+#define CAUSE_MISALIGNED_FETCH		0
+#define CAUSE_FETCH_ACCESS		1
+#define CAUSE_ILLEGAL_INSTRUCTION	2
+#define CAUSE_BREAKPOINT		3
+#define CAUSE_MISALIGNED_LOAD		4
+#define CAUSE_LOAD_ACCESS		5
+#define CAUSE_MISALIGNED_STORE		6
+#define CAUSE_STORE_ACCESS		7
+#define CAUSE_USER_ECALL		8
+#define CAUSE_SUPERVISOR_ECALL		9
+#define CAUSE_MACHINE_ECALL		11
+#define CAUSE_FETCH_PAGE_FAULT		12
+#define CAUSE_LOAD_PAGE_FAULT		13
+#define CAUSE_STORE_PAGE_FAULT		15
 
 #define DEFAULT_RSTVEC		0x00001000
 #define DEFAULT_NMIVEC		0x00001004
@@ -121,12 +128,15 @@
 #define PTE_SW(PTE)	((0x88888880U >> ((PTE) & 0x1F)) & 1)
 #define PTE_SX(PTE)	((0xA0A0A000U >> ((PTE) & 0x1F)) & 1)
 
-#define PTE_CHECK_PERM(PTE, SUPERVISOR, STORE, FETCH) \
+#define PTE_CHECK_PERM(_PTE, _SUPERVISOR, STORE, FETCH) \
+	typeof(_PTE) (PTE) = (_PTE); \
+	typeof(_SUPERVISOR) (SUPERVISOR) = (_SUPERVISOR); \
 	((STORE) ? ((SUPERVISOR) ? PTE_SW(PTE) : PTE_UW(PTE)) : \
 	(FETCH) ? ((SUPERVISOR) ? PTE_SX(PTE) : PTE_UX(PTE)) : \
 	((SUPERVISOR) ? PTE_SR(PTE) : PTE_UR(PTE)))
 
 #ifdef __riscv
+
 #ifdef CONFIG_64BIT
 # define MSTATUS_SD MSTATUS64_SD
 # define SSTATUS_SD SSTATUS64_SD
@@ -140,49 +150,10 @@
 # define MCAUSE_INT MCAUSE32_INT
 # define MCAUSE_CAUSE MCAUSE32_CAUSE
 #endif
+
 #define RISCV_PGSHIFT 12
 #define RISCV_PGSIZE BIT(RISCV_PGSHIFT)
 
-#ifndef __ASSEMBLER__
+#endif /* __riscv */
 
-#ifdef __GNUC__
-
-#define read_csr(reg) ({ unsigned long __tmp; \
-	asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
-	__tmp; })
-
-#define write_csr(reg, val) ({ \
-if (__builtin_constant_p(val) && (unsigned long)(val) < 32) \
-	asm volatile ("csrw " #reg ", %0" :: "i"(val)); \
-else \
-	asm volatile ("csrw " #reg ", %0" :: "r"(val)); })
-
-#define swap_csr(reg, val) ({ unsigned long __tmp; \
-if (__builtin_constant_p(val) && (unsigned long)(val) < 32) \
-	asm volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "i"(val)); \
-else \
-	asm volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "r"(val)); \
-	__tmp; })
-
-#define set_csr(reg, bit) ({ unsigned long __tmp; \
-if (__builtin_constant_p(bit) && (unsigned long)(bit) < 32) \
-	asm volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
-else \
-	asm volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
-	__tmp; })
-
-#define clear_csr(reg, bit) ({ unsigned long __tmp; \
-if (__builtin_constant_p(bit) && (unsigned long)(bit) < 32) \
-	asm volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "i"(bit)); \
-else \
-	asm volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
-	__tmp; })
-
-#define rdtime() read_csr(time)
-#define rdcycle() read_csr(cycle)
-#define rdinstret() read_csr(instret)
-
-#endif
-#endif
-#endif
-#endif
+#endif /* RISCV_CSR_ENCODING_H */

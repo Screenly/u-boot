@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 /*
  * (C) Copyright 2015 Google, Inc
- *
- * SPDX-License-Identifier:	GPL-2.0
  */
 
 #ifndef _ASM_ARCH_CLOCK_H
@@ -42,6 +41,12 @@ static inline int rk_pll_id(enum rk_clk_id clk_id)
 struct sysreset_reg {
 	unsigned int glb_srst_fst_value;
 	unsigned int glb_srst_snd_value;
+};
+
+struct softreset_reg {
+        void __iomem *base;
+        unsigned int sf_reset_offset;
+        unsigned int sf_reset_num;
 };
 
 /**

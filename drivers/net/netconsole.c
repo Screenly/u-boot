@@ -1,16 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2004
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 #include <command.h>
+#include <env.h>
 #include <stdio_dev.h>
 #include <net.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 #ifndef CONFIG_NETCONSOLE_BUFFER_SIZE
 #define CONFIG_NETCONSOLE_BUFFER_SIZE 512
@@ -58,7 +56,7 @@ static int is_broadcast(struct in_addr ip)
 	static struct in_addr netmask;
 	static struct in_addr our_ip;
 	static int env_changed_id;
-	int env_id = get_env_id();
+	int env_id = env_get_id();
 
 	/* update only when the environment has changed */
 	if (env_changed_id != env_id) {
@@ -78,7 +76,7 @@ static int refresh_settings_from_env(void)
 {
 	const char *p;
 	static int env_changed_id;
-	int env_id = get_env_id();
+	int env_id = env_get_id();
 
 	/* update only when the environment has changed */
 	if (env_changed_id != env_id) {

@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2011-2015 Panasonic Corporation
  * Copyright (C) 2016      Socionext Inc.
  *   Author: Masahiro Yamada <yamada.masahiro@socionext.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -141,7 +140,7 @@ static int __uniphier_memconf_init(const struct uniphier_board_data *bd,
 	}
 
 out:
-	writel(val, SG_MEMCONF);
+	writel(val, sg_base + SG_MEMCONF);
 
 	return 0;
 }

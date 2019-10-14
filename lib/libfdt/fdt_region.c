@@ -1,8 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+ OR BSD-2-Clause
 /*
  * libfdt - Flat Device Tree manipulation
  * Copyright (C) 2013 Google, Inc
  * Written by Simon Glass <sjg@chromium.org>
- * SPDX-License-Identifier:	GPL-2.0+ BSD-2-Clause
  */
 
 #include <linux/libfdt_env.h>
@@ -13,8 +13,6 @@
 #else
 #include "fdt_host.h"
 #endif
-
-#include "libfdt_internal.h"
 
 #define FDT_MAX_DEPTH	32
 
@@ -98,6 +96,9 @@ int fdt_find_regions(const void *fdt, char * const inc[], int inc_count,
 			break;
 
 		case FDT_END_NODE:
+			/* Depth must never go below -1 */
+			if (depth < 0)
+				return -FDT_ERR_BADSTRUCTURE;
 			include = want;
 			want = stack[depth--];
 			while (end > path && *--end != '/')

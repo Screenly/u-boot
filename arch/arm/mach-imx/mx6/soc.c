@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2007
  * Sascha Hauer, Pengutronix
  *
  * (C) Copyright 2009 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -51,7 +50,7 @@ U_BOOT_DEVICE(imx6_thermal) = {
 };
 #endif
 
-#if defined(CONFIG_SECURE_BOOT)
+#if defined(CONFIG_IMX_HAB)
 struct imx_sec_config_fuse_t const imx_sec_config_fuse = {
 	.bank = 0,
 	.word = 6,
@@ -86,6 +85,10 @@ u32 get_cpu_rev(void)
 				type = MXC_CPU_MX6D;
 		}
 
+		if (type == MXC_CPU_MX6ULL) {
+			if (readl(SRC_BASE_ADDR + 0x1c) & (1 << 6))
+				type = MXC_CPU_MX6ULZ;
+		}
 	}
 	major = ((reg >> 8) & 0xff);
 	if ((major >= 1) &&
@@ -96,6 +99,11 @@ u32 get_cpu_rev(void)
 			type = MXC_CPU_MX6DP;
 	}
 	reg &= 0xff;		/* mx6 silicon revision */
+
+	/* For 6DQ, the value 0x00630005 is Silicon revision 1.3*/
+	if (((type == MXC_CPU_MX6Q) || (type == MXC_CPU_MX6D)) && (reg == 0x5))
+		reg = 0x3;
+
 	return (type << 12) | (reg + (0x10 * (major + 1)));
 }
 
@@ -549,8 +557,10 @@ const struct boot_mode soc_boot_modes[] = {
 
 void reset_misc(void)
 {
-#ifdef CONFIG_VIDEO_MXS
+#ifndef CONFIG_SPL_BUILD
+#if defined(CONFIG_VIDEO_MXS) && !defined(CONFIG_DM_VIDEO)
 	lcdif_power_down();
+#endif
 #endif
 }
 
@@ -650,9 +660,22 @@ void imx_setup_hdmi(void)
 }
 #endif
 
+
+/*
+ * gpr_init() function is common for boards using MX6S, MX6DL, MX6D,
+ * MX6Q and MX6QP processors
+ */
 void gpr_init(void)
 {
 	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
+
+	/*
+	 * If this function is used in a common MX6 spl implementation
+	 * we have to ensure that it is only called for suitable cpu types,
+	 * otherwise it breaks hardware parts like enet1, can1, can2, etc.
+	 */
+	if (!is_mx6dqp() && !is_mx6dq() && !is_mx6sdl())
+		return;
 
 	/* enable AXI cache for VDOA/VPU/IPU */
 	writel(0xF00000CF, &iomux->gpr[4]);

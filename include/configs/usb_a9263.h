@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2007-2013
  * Stelian Pop <stelian.pop@leadtechdesign.com>
@@ -9,8 +10,6 @@
  *
  * U-Boot image has to be less than 200704 bytes, otherwise at91bootstrap
  * installed on board will not be able to load it properly.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -22,8 +21,6 @@
 #define CONFIG_SYS_AT91_SLOW_CLOCK	32768
 
 #define CONFIG_MACH_TYPE		MACH_TYPE_USB_A9263
-
-#define CONFIG_ARCH_CPU_INIT
 
 #define CONFIG_CMDLINE_TAG	/* enable passing of ATAGs      */
 #define CONFIG_SETUP_MEMORY_TAGS
@@ -40,7 +37,6 @@
 #define CONFIG_BOOTP_BOOTFILESIZE
 
 /* SDRAM */
-#define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_SDRAM_BASE		ATMEL_BASE_CS1
 #define CONFIG_SYS_SDRAM_SIZE		0x04000000
 
@@ -49,7 +45,6 @@
 
 /* NAND flash */
 #ifdef CONFIG_CMD_NAND
-#define CONFIG_NAND_ATMEL
 #define CONFIG_SYS_MAX_NAND_DEVICE		1
 #define CONFIG_SYS_NAND_BASE			ATMEL_BASE_CS3
 /* our ALE is AD21 */
@@ -82,10 +77,6 @@
 #define CONFIG_SYS_MEMTEST_END			0x23e00000
 
 /* bootstrap + u-boot + env + linux in dataflash on CS0 */
-#define CONFIG_ENV_OFFSET	0x2000
-#define CONFIG_ENV_SIZE		0x2000
-#define CONFIG_ENV_SECT_SIZE	CONFIG_ENV_SIZE
-#define CONFIG_ENV_SPI_MAX_HZ	15000000
 #define CONFIG_BOOTCOMMAND	"nboot 21000000 0"
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \

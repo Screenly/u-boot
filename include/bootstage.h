@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * This file implements recording of each stage of the boot process. It is
  * intended to implement timing of each stage, reporting this information
@@ -5,8 +6,6 @@
  * Note that it requires timer_get_boot_us() to be defined by the board
  *
  * Copyright (c) 2011 The Chromium OS Authors.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _BOOTSTAGE_H
@@ -182,6 +181,7 @@ enum bootstage_id {
 	BOOTSTAGE_ID_BOOTM_START,
 	BOOTSTAGE_ID_BOOTM_HANDOFF,
 	BOOTSTAGE_ID_MAIN_LOOP,
+	BOOTSTAGE_ID_ENTER_CLI_LOOP,
 	BOOTSTAGE_KERNELREAD_START,
 	BOOTSTAGE_KERNELREAD_STOP,
 	BOOTSTAGE_ID_BOARD_INIT,

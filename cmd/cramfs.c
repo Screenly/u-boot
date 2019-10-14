@@ -1,5 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
- * SPDX-License-Identifier:	GPL-2.0+
  *
  * based on: cmd_jffs2.c
  *
@@ -12,6 +12,7 @@
  */
 #include <common.h>
 #include <command.h>
+#include <env.h>
 #include <malloc.h>
 #include <mapmem.h>
 #include <linux/list.h>

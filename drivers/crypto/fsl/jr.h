@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright 2008-2014 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  *
  */
 
@@ -34,8 +33,6 @@
 #define JRNSLIODN_MASK		0x0fff0000
 #define JRSLIODN_SHIFT		0
 #define JRSLIODN_MASK		0x00000fff
-#define JROWN_NS		0x00000008
-#define JRMID_NS		0x00000001
 
 #define JQ_DEQ_ERR		-1
 #define JQ_DEQ_TO_ERR		-2

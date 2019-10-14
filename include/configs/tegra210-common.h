@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2013-2015
  * NVIDIA Corporation <www.nvidia.com>
- *
- * SPDX-License-Identifier:     GPL-2.0+
  */
 
 #ifndef _TEGRA210_COMMON_H_
@@ -14,10 +13,6 @@
  * NS16550 Configuration
  */
 #define V_NS16550_CLK		408000000	/* 408MHz (pllp_out0) */
-
-/*-----------------------------------------------------------------------
- * Physical Memory Map
- */
 
 /* Generic Interrupt Controller */
 #define CONFIG_GICV2

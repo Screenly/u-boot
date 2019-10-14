@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2015 Marek Vasut <marex@denx.de>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 #ifndef __CONFIG_SOCFPGA_SOCRATES_H__
 #define __CONFIG_SOCFPGA_SOCRATES_H__
@@ -14,8 +13,6 @@
 /* Booting Linux */
 #define CONFIG_LOADADDR		0x01000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
-
-/* Ethernet on SoC (EMAC) */
 
 /* The rest of the configuration is shared */
 #include <configs/socfpga_common.h>

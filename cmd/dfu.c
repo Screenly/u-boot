@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * cmd_dfu.c -- dfu command
  *
@@ -7,8 +8,6 @@
  * Copyright (C) 2012 Samsung Electronics
  * authors: Andrzej Pietrasiewicz <andrzej.p@samsung.com>
  *	    Lukasz Majewski <l.majewski@samsung.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -28,8 +27,10 @@ static int do_dfu(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 #ifdef CONFIG_DFU_OVER_USB
 	char *usb_controller = argv[1];
 #endif
+#if defined(CONFIG_DFU_OVER_USB) || defined(CONFIG_DFU_OVER_TFTP)
 	char *interface = argv[2];
 	char *devstring = argv[3];
+#endif
 
 	int ret = 0;
 #ifdef CONFIG_DFU_OVER_TFTP
@@ -64,6 +65,7 @@ done:
 
 U_BOOT_CMD(dfu, CONFIG_SYS_MAXARGS, 1, do_dfu,
 	"Device Firmware Upgrade",
+	""
 #ifdef CONFIG_DFU_OVER_USB
 	"<USB_controller> <interface> <dev> [list]\n"
 	"  - device firmware upgrade via <USB_controller>\n"

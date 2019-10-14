@@ -123,6 +123,27 @@ static inline void __raw_readsl(unsigned long addr, void *data, int longlen)
 #define readq(c)	({ u64 __v = __arch_getq(c); __iormb(); __v; })
 
 /*
+ * Relaxed I/O memory access primitives. These follow the Device memory
+ * ordering rules but do not guarantee any ordering relative to Normal memory
+ * accesses.
+ */
+#define readb_relaxed(c)	({ u8  __r = __raw_readb(c); __r; })
+#define readw_relaxed(c)	({ u16 __r = le16_to_cpu((__force __le16) \
+						__raw_readw(c)); __r; })
+#define readl_relaxed(c)	({ u32 __r = le32_to_cpu((__force __le32) \
+						__raw_readl(c)); __r; })
+#define readq_relaxed(c)	({ u64 __r = le64_to_cpu((__force __le64) \
+						__raw_readq(c)); __r; })
+
+#define writeb_relaxed(v, c)	((void)__raw_writeb((v), (c)))
+#define writew_relaxed(v, c)	((void)__raw_writew((__force u16) \
+						    cpu_to_le16(v), (c)))
+#define writel_relaxed(v, c)	((void)__raw_writel((__force u32) \
+						    cpu_to_le32(v), (c)))
+#define writeq_relaxed(v, c)	((void)__raw_writeq((__force u64) \
+						    cpu_to_le64(v), (c)))
+
+/*
  * The compiler seems to be incapable of optimising constants
  * properly.  Spell it out to the compiler in some cases.
  * These are only valid for small values of "off" (< 1<<12)
@@ -160,7 +181,12 @@ static inline void __raw_readsl(unsigned long addr, void *data, int longlen)
 #define in_be32(a)	in_arch(l,be32,a)
 #define in_be16(a)	in_arch(w,be16,a)
 
+#define out_32(a,v)	__raw_writel(v,a)
+#define out_16(a,v)	__raw_writew(v,a)
 #define out_8(a,v)	__raw_writeb(v,a)
+
+#define in_32(a)	__raw_readl(a)
+#define in_16(a)	__raw_readw(a)
 #define in_8(a)		__raw_readb(a)
 
 #define clrbits(type, addr, clear) \
@@ -180,6 +206,10 @@ static inline void __raw_readsl(unsigned long addr, void *data, int longlen)
 #define setbits_le32(addr, set) setbits(le32, addr, set)
 #define clrsetbits_le32(addr, clear, set) clrsetbits(le32, addr, clear, set)
 
+#define clrbits_32(addr, clear) clrbits(32, addr, clear)
+#define setbits_32(addr, set) setbits(32, addr, set)
+#define clrsetbits_32(addr, clear, set) clrsetbits(32, addr, clear, set)
+
 #define clrbits_be16(addr, clear) clrbits(be16, addr, clear)
 #define setbits_be16(addr, set) setbits(be16, addr, set)
 #define clrsetbits_be16(addr, clear, set) clrsetbits(be16, addr, clear, set)
@@ -187,6 +217,10 @@ static inline void __raw_readsl(unsigned long addr, void *data, int longlen)
 #define clrbits_le16(addr, clear) clrbits(le16, addr, clear)
 #define setbits_le16(addr, set) setbits(le16, addr, set)
 #define clrsetbits_le16(addr, clear, set) clrsetbits(le16, addr, clear, set)
+
+#define clrbits_16(addr, clear) clrbits(16, addr, clear)
+#define setbits_16(addr, set) setbits(16, addr, set)
+#define clrsetbits_16(addr, clear, set) clrsetbits(16, addr, clear, set)
 
 #define clrbits_8(addr, clear) clrbits(8, addr, clear)
 #define setbits_8(addr, set) setbits(8, addr, set)
@@ -281,65 +315,9 @@ extern void _memset_io(unsigned long, int, size_t);
 
 extern void __readwrite_bug(const char *fn);
 
-/*
- * If this architecture has PCI memory IO, then define the read/write
- * macros.  These should only be used with the cookie passed from
- * ioremap.
- */
-#ifdef __mem_pci
-
-#define readb(c) ({ unsigned int __v = __raw_readb(__mem_pci(c)); __v; })
-#define readw(c) ({ unsigned int __v = le16_to_cpu(__raw_readw(__mem_pci(c))); __v; })
-#define readl(c) ({ unsigned int __v = le32_to_cpu(__raw_readl(__mem_pci(c))); __v; })
-
-#define writeb(v,c)		__raw_writeb(v,__mem_pci(c))
-#define writew(v,c)		__raw_writew(cpu_to_le16(v),__mem_pci(c))
-#define writel(v,c)		__raw_writel(cpu_to_le32(v),__mem_pci(c))
-
-#define memset_io(c,v,l)		_memset_io(__mem_pci(c),(v),(l))
-#define memcpy_fromio(a,c,l)		_memcpy_fromio((a),__mem_pci(c),(l))
-#define memcpy_toio(c,a,l)		_memcpy_toio(__mem_pci(c),(a),(l))
-
-#define eth_io_copy_and_sum(s,c,l,b) \
-				eth_copy_and_sum((s),__mem_pci(c),(l),(b))
-
-static inline int
-check_signature(unsigned long io_addr, const unsigned char *signature,
-		int length)
-{
-	int retval = 0;
-	do {
-		if (readb(io_addr) != *signature)
-			goto out;
-		io_addr++;
-		signature++;
-		length--;
-	} while (length);
-	retval = 1;
-out:
-	return retval;
-}
-
-#else
 #define memset_io(a, b, c)		memset((void *)(a), (b), (c))
 #define memcpy_fromio(a, b, c)		memcpy((a), (void *)(b), (c))
 #define memcpy_toio(a, b, c)		memcpy((void *)(a), (b), (c))
-
-#if !defined(readb)
-
-#define readb(addr)			(__readwrite_bug("readb"),0)
-#define readw(addr)			(__readwrite_bug("readw"),0)
-#define readl(addr)			(__readwrite_bug("readl"),0)
-#define writeb(v,addr)			__readwrite_bug("writeb")
-#define writew(v,addr)			__readwrite_bug("writew")
-#define writel(v,addr)			__readwrite_bug("writel")
-
-#define eth_io_copy_and_sum(a,b,c,d)	__readwrite_bug("eth_io_copy_and_sum")
-
-#define check_signature(io,sig,len)	(0)
-
-#endif
-#endif	/* __mem_pci */
 
 /*
  * If this architecture has ISA IO, then define the isa_read/isa_write

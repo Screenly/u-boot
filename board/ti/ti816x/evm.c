@@ -1,15 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * evm.c
  *
  * Copyright (C) 2013, Adeneo Embedded <www.adeneo-embedded.com>
  * Antoine Tenart, <atenart@adeneo-embedded.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
+#include <env.h>
 #include <spl.h>
-#include <netdev.h>
 #include <asm/cache.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
@@ -56,7 +55,7 @@ int board_eth_init(bd_t *bis)
 			printf("Unable to read MAC address. Set <ethaddr>\n");
 	}
 
-	return davinci_emac_initialize();
+	return 0;
 }
 
 #ifdef CONFIG_SPL_BUILD

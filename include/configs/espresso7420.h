@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Configuration settings for the SAMSUNG ESPRESSO7420 board.
  * Copyright (C) 2016 Samsung Electronics
  * Thomas Abraham <thomas.ab@samsung.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_ESPRESSO7420_H
@@ -22,10 +21,7 @@
 /* select serial console configuration */
 #define CONFIG_DEFAULT_CONSOLE	"console=ttySAC1,115200n8\0"
 
-#define CONFIG_DEFAULT_CONSOLE	"console=ttySAC1,115200n8\0"
-
 /* DRAM Memory Banks */
-#define CONFIG_NR_DRAM_BANKS	8
 #define SDRAM_BANK_SIZE		(256UL << 20UL)	/* 256 MB */
 
 #endif	/* __CONFIG_ESPRESSO7420_H */

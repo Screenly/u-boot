@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * r8a7792 Clock Pulse Generator / Module Standby and Software Reset
  *
@@ -6,10 +7,6 @@
  * Based on clk-rcar-gen2.c
  *
  * Copyright (C) 2013 Ideas On Board SPRL
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
  */
 
 #include <common.h>
@@ -39,7 +36,7 @@ enum clk_ids {
 	MOD_CLK_BASE
 };
 
-static const struct cpg_core_clk r8a7792_core_clks[] __initconst = {
+static const struct cpg_core_clk r8a7792_core_clks[] = {
 	/* External Clock Inputs */
 	DEF_INPUT("extal",     CLK_EXTAL),
 
@@ -52,7 +49,6 @@ static const struct cpg_core_clk r8a7792_core_clks[] __initconst = {
 	DEF_FIXED(".pll1_div2", CLK_PLL1_DIV2, CLK_PLL1, 2, 1),
 
 	/* Core Clock Outputs */
-	DEF_BASE("lb",   R8A7792_CLK_LB,   CLK_TYPE_GEN2_LB,   CLK_PLL1),
 	DEF_BASE("qspi", R8A7792_CLK_QSPI, CLK_TYPE_GEN2_QSPI, CLK_PLL1_DIV2),
 
 	DEF_FIXED("z",      R8A7792_CLK_Z,     CLK_PLL0,          1, 1),
@@ -62,6 +58,7 @@ static const struct cpg_core_clk r8a7792_core_clks[] __initconst = {
 	DEF_FIXED("hp",     R8A7792_CLK_HP,    CLK_PLL1,         12, 1),
 	DEF_FIXED("i",      R8A7792_CLK_I,     CLK_PLL1,          3, 1),
 	DEF_FIXED("b",      R8A7792_CLK_B,     CLK_PLL1,         12, 1),
+	DEF_FIXED("lb",     R8A7792_CLK_LB,    CLK_PLL1,         24, 1),
 	DEF_FIXED("p",      R8A7792_CLK_P,     CLK_PLL1,         24, 1),
 	DEF_FIXED("cl",     R8A7792_CLK_CL,    CLK_PLL1,         48, 1),
 	DEF_FIXED("m2",     R8A7792_CLK_M2,    CLK_PLL1,          8, 1),
@@ -78,7 +75,7 @@ static const struct cpg_core_clk r8a7792_core_clks[] __initconst = {
 	DEF_FIXED("osc",    R8A7792_CLK_OSC,   CLK_PLL1,      12288, 1),
 };
 
-static const struct mssr_mod_clk r8a7792_mod_clks[] __initconst = {
+static const struct mssr_mod_clk r8a7792_mod_clks[] = {
 	DEF_MOD("msiof0",		   0,	R8A7792_CLK_MP),
 	DEF_MOD("jpu",			 106,	R8A7792_CLK_M2),
 	DEF_MOD("tmu1",			 111,	R8A7792_CLK_P),
@@ -97,6 +94,7 @@ static const struct mssr_mod_clk r8a7792_mod_clks[] __initconst = {
 	DEF_MOD("tpu0",			 304,	R8A7792_CLK_CP),
 	DEF_MOD("sdhi0",		 314,	R8A7792_CLK_SD),
 	DEF_MOD("cmt1",			 329,	R8A7792_CLK_R),
+	DEF_MOD("rwdt",			 402,	R8A7792_CLK_R),
 	DEF_MOD("irqc",			 407,	R8A7792_CLK_CP),
 	DEF_MOD("intc-sys",		 408,	R8A7792_CLK_ZS),
 	DEF_MOD("audio-dmac0",		 502,	R8A7792_CLK_HP),
@@ -152,10 +150,6 @@ static const struct mssr_mod_clk r8a7792_mod_clks[] __initconst = {
 	DEF_MOD("ssi3",			1012,	MOD_CLK_ID(1005)),
 };
 
-static const unsigned int r8a7792_crit_mod_clks[] __initconst = {
-	MOD_CLK_ID(408),	/* INTC-SYS (GIC) */
-};
-
 /*
  * CPG Clock Data
  */
@@ -179,7 +173,7 @@ static const unsigned int r8a7792_crit_mod_clks[] __initconst = {
 #define CPG_PLL_CONFIG_INDEX(md)	((((md) & BIT(14)) >> 12) | \
 					 (((md) & BIT(13)) >> 12) | \
 					 (((md) & BIT(19)) >> 19))
-static const struct rcar_gen2_cpg_pll_config cpg_pll_configs[8] __initconst = {
+static const struct rcar_gen2_cpg_pll_config cpg_pll_configs[8] = {
 	{ 1, 208, 106, 200 },
 	{ 1, 208,  88, 200 },
 	{ 1, 156,  80, 150 },
@@ -218,10 +212,8 @@ static const struct cpg_mssr_info r8a7792_cpg_mssr_info = {
 	.mstp_table		= r8a7792_mstp_table,
 	.mstp_table_size	= ARRAY_SIZE(r8a7792_mstp_table),
 	.reset_node		= "renesas,r8a7792-rst",
-	.extal_usb_node		= "usb_extal",
 	.mod_clk_base		= MOD_CLK_BASE,
 	.clk_extal_id		= CLK_EXTAL,
-	.clk_extal_usb_id	= CLK_USB_EXTAL,
 	.pll0_div		= 2,
 	.get_pll_config		= r8a7792_get_pll_config,
 };

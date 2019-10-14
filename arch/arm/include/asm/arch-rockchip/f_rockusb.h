@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2017
  *
  * Eddie Cai <eddie.cai.linux@gmail.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _F_ROCKUSB_H_
@@ -28,6 +27,7 @@
  */
 
 #define RKUSB_BUF_SIZE		EP_BUFFER_SIZE * 2
+#define RKBLOCK_BUF_SIZE		4096
 
 #define RKUSB_STATUS_IDLE			0
 #define RKUSB_STATUS_CMD			1
@@ -63,6 +63,7 @@ K_FW_LOW_FORMAT = 0x1C,
 K_FW_SET_RESET_FLAG = 0x1E,
 K_FW_SPI_READ_10 = 0x21,
 K_FW_SPI_WRITE_10 = 0x22,
+K_FW_LBA_ERASE_10 = 0x25,
 
 K_FW_SESSION = 0X30,
 K_FW_RESET = 0xff,
@@ -121,6 +122,8 @@ struct f_rockusb {
 	unsigned int lba;
 	unsigned int dl_size;
 	unsigned int dl_bytes;
+	unsigned int ul_size;
+	unsigned int ul_bytes;
 	struct blk_desc *desc;
 	int reboot_flag;
 	void *buf;

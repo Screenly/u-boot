@@ -1,10 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Configuation settings for the Renesas SH7763RDP board
  *
  * Copyright (C) 2008 Renesas Solutions Corp.
  * Copyright (C) 2008 Nobuhiro Iwamatsu <iwamatsu.nobuhiro@renesas.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __SH7763RDP_H
@@ -16,7 +15,6 @@
 #define CONFIG_ENV_OVERWRITE    1
 
 #define CONFIG_DISPLAY_BOARDINFO
-#undef  CONFIG_SHOW_BOOT_PROGRESS
 
 /* SCIF */
 #define CONFIG_CONS_SCIF2		1
@@ -45,8 +43,6 @@
 #define CONFIG_SYS_MALLOC_LEN		(1024 * 1024)
 #define CONFIG_SYS_BOOTMAPSZ		(8 * 1024 * 1024)
 
-#define CONFIG_SYS_FLASH_CFI
-#define CONFIG_FLASH_CFI_DRIVER
 #undef  CONFIG_SYS_FLASH_QUIET_TEST
 #define CONFIG_SYS_FLASH_EMPTY_INFO	/* print 'E' for empty sector on flinfo */
 /* Timeout for Flash erase operations (in ms) */
@@ -58,7 +54,6 @@
 /* Timeout for Flash clear lock bit operations (in ms) */
 #define CONFIG_SYS_FLASH_UNLOCK_TOUT	(3 * 1000)
 /* Use hardware flash sectors protection instead of U-Boot software protection */
-#undef  CONFIG_SYS_FLASH_PROTECTION
 #undef  CONFIG_SYS_DIRECT_FLASH_TFTP
 #define CONFIG_ENV_SECT_SIZE	(128 * 1024)
 #define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
@@ -70,9 +65,7 @@
 
 /* Clock */
 #define CONFIG_SYS_CLK_FREQ	66666666
-#define CONFIG_SH_TMU_CLK_FREQ CONFIG_SYS_CLK_FREQ
 #define CONFIG_SH_SCIF_CLK_FREQ CONFIG_SYS_CLK_FREQ
-#define CONFIG_SYS_TMU_CLK_DIV		(4)	/* 4 (default), 16, 64, 256 or 1024 */
 
 /* Ether */
 #define CONFIG_SH_ETHER_USE_PORT (1)

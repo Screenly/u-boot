@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2016 Stephen Warren <swarren@wwwdotorg.org>
  *
@@ -9,8 +10,6 @@
  * (C) Copyright 2004
  * ARM Ltd.
  * Philippe Robin, <philippe.robin@arm.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /* Simple U-Boot driver for the BCM283x mini UART */
@@ -200,6 +199,8 @@ U_BOOT_DRIVER(serial_bcm283x_mu) = {
 	.platdata_auto_alloc_size = sizeof(struct bcm283x_mu_serial_platdata),
 	.probe = bcm283x_mu_serial_probe,
 	.ops = &bcm283x_mu_serial_ops,
+#if !CONFIG_IS_ENABLED(OF_CONTROL)
 	.flags = DM_FLAG_PRE_RELOC,
+#endif
 	.priv_auto_alloc_size = sizeof(struct bcm283x_mu_priv),
 };

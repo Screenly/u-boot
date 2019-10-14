@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2008
  * Sergei Poselenov, Emcraft Systems, sposelenov@emcraft.com.
@@ -7,11 +8,10 @@
  * Xianghua Xiao, (X.Xiao@motorola.com)
  *
  * (C) Copyright 2002 Scott McNutt <smcnutt@artesyncp.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
+#include <env.h>
 #include <pci.h>
 #include <asm/processor.h>
 #include <asm/immap_85xx.h>

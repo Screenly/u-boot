@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (C) 2018 Alexander Graf <agraf@suse.de>
  *
@@ -6,8 +7,6 @@
  *
  * This driver gets instantiated by the GPIO driver, because both devices
  * share the same device node.
- *
- * SPDX-License-Identifier:	GPL-2.0
  * https://spdx.org/licenses
  */
 
@@ -149,5 +148,7 @@ U_BOOT_DRIVER(pinctrl_bcm283x) = {
 	.priv_auto_alloc_size = sizeof(struct bcm283x_pinctrl_priv),
 	.ops		= &bcm283x_pinctrl_ops,
 	.probe		= bcm283x_pinctl_probe,
+#if !CONFIG_IS_ENABLED(OF_CONTROL)
 	.flags		= DM_FLAG_PRE_RELOC,
+#endif
 };

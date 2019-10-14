@@ -31,8 +31,6 @@
 /*
  * NOR Flash ( Spantion S29GL256P )
  */
-#define CONFIG_SYS_FLASH_CFI
-#define CONFIG_FLASH_CFI_DRIVER
 #define CONFIG_SYS_FLASH_BASE		(0xA0000000)
 #define CONFIG_SYS_MAX_FLASH_BANKS (1)
 #define CONFIG_SYS_MAX_FLASH_SECT  256
@@ -46,9 +44,7 @@
  * SuperH Clock setting
  */
 #define CONFIG_SYS_CLK_FREQ	60000000
-#define CONFIG_SH_TMU_CLK_FREQ CONFIG_SYS_CLK_FREQ
 #define CONFIG_SH_SCIF_CLK_FREQ CONFIG_SYS_CLK_FREQ
-#define CONFIG_SYS_TMU_CLK_DIV		4
 #define	CONFIG_SYS_PLL_SETTLING_TIME	100/* in us */
 
 /*
@@ -68,19 +64,6 @@
 /*
  * SuperH PCI Bridge Configration
  */
-#define CONFIG_SH4_PCI
 #define CONFIG_SH7751_PCI
-#define CONFIG_PCI_SCAN_SHOW	1
-#define __mem_pci
-
-#define CONFIG_PCI_MEM_BUS	0xFD000000	/* Memory space base addr */
-#define CONFIG_PCI_MEM_PHYS	CONFIG_PCI_MEM_BUS
-#define CONFIG_PCI_MEM_SIZE	0x01000000	/* Size of Memory window */
-#define CONFIG_PCI_IO_BUS	0xFE240000	/* IO space base address */
-#define CONFIG_PCI_IO_PHYS	CONFIG_PCI_IO_BUS
-#define CONFIG_PCI_IO_SIZE	0x00040000	/* Size of IO window */
-#define CONFIG_PCI_SYS_BUS	CONFIG_SYS_SDRAM_BASE
-#define CONFIG_PCI_SYS_PHYS	CONFIG_SYS_SDRAM_BASE
-#define CONFIG_PCI_SYS_SIZE	CONFIG_SYS_SDRAM_SIZE
 
 #endif /* __CONFIG_H */

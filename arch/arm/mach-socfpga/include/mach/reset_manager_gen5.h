@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  *  Copyright (C) 2012-2017 Altera Corporation <www.altera.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _RESET_MANAGER_GEN5_H_
@@ -9,7 +8,7 @@
 
 #include <dt-bindings/reset/altr,rst-mgr.h>
 
-void reset_deassert_peripherals_handoff(void);
+void socfpga_bridges_set_handoff_regs(bool h2f, bool lwh2f, bool f2h);
 void socfpga_bridges_reset(int enable);
 
 struct socfpga_reset_manager {

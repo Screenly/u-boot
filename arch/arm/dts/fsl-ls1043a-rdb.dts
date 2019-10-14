@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+ OR X11
 /*
  * Device Tree Include file for Freescale Layerscape-1043A family SoC.
  *
  * Copyright (C) 2015, Freescale Semiconductor
  *
  * Mingkai Hu <Mingkai.hu@freescale.com>
- *
- * SPDX-License-Identifier:    GPL-2.0+	X11
  */
 
 /dts-v1/;
@@ -27,7 +26,7 @@
 	dspiflash: n25q12a {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "spi-flash";
+		compatible = "jedec,spi-nor";
 		reg = <0>;
 		spi-max-frequency = <1000000>; /* input clock */
 	};

@@ -1,9 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2013, 2014, 2017 Markus Niebel <Markus.Niebel@tq-group.com>
  *
  * Configuration settings for the TQ Systems TQMa6<Q,D,DL,S> module.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -34,11 +33,6 @@
 /* SPI Flash */
 
 #define TQMA6_SPI_FLASH_SECTOR_SIZE	SZ_64K
-
-#define CONFIG_SF_DEFAULT_BUS	0
-#define CONFIG_SF_DEFAULT_CS	0
-#define CONFIG_SF_DEFAULT_SPEED	50000000
-#define CONFIG_SF_DEFAULT_MODE	(SPI_MODE_0)
 
 /* I2C Configs */
 #define CONFIG_SYS_I2C
@@ -71,7 +65,6 @@
 
 #define CONFIG_FEC_MXC
 #define IMX_FEC_BASE			ENET_BASE_ADDR
-#define CONFIG_MII
 
 #define CONFIG_ARP_TIMEOUT		200UL
 
@@ -160,11 +153,6 @@
 #define CONFIG_ENV_SECT_SIZE		TQMA6_SPI_FLASH_SECTOR_SIZE
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + \
 					 CONFIG_ENV_SECT_SIZE)
-
-#define CONFIG_ENV_SPI_BUS		(CONFIG_SF_DEFAULT_BUS)
-#define CONFIG_ENV_SPI_CS		(CONFIG_SF_DEFAULT_CS)
-#define CONFIG_ENV_SPI_MAX_HZ		(CONFIG_SF_DEFAULT_SPEED)
-#define CONFIG_ENV_SPI_MODE		(CONFIG_SF_DEFAULT_MODE)
 
 #define TQMA6_FDT_OFFSET		(CONFIG_ENV_OFFSET_REDUND + \
 					 CONFIG_ENV_SECT_SIZE)
@@ -324,7 +312,6 @@
 	TQMA6_EXTRA_BOOTDEV_ENV_SETTINGS                                      \
 
 /* Physical Memory Map */
-#define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
 
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM

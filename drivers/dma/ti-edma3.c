@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Enhanced Direct Memory Access (EDMA3) Controller
  *
@@ -5,14 +6,12 @@
  *     Texas Instruments Incorporated, <www.ti.com>
  *
  * Author: Ivan Khoronzhuk <ivan.khoronzhuk@ti.com>
- *
- * SPDX-License-Identifier:     GPL-2.0+
  */
 
 #include <asm/io.h>
 #include <common.h>
 #include <dm.h>
-#include <dma.h>
+#include <dma-uclass.h>
 #include <asm/omap_common.h>
 #include <asm/ti-common/ti-edma3.h>
 

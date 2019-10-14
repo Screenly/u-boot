@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2017 Google, Inc
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -14,8 +13,6 @@
 #define WDT_AST2500	2500
 #define WDT_AST2400	2400
 
-DECLARE_GLOBAL_DATA_PTR;
-
 struct ast_wdt_priv {
 	struct ast_wdt *regs;
 };
@@ -25,6 +22,12 @@ static int ast_wdt_start(struct udevice *dev, u64 timeout, ulong flags)
 	struct ast_wdt_priv *priv = dev_get_priv(dev);
 	ulong driver_data = dev_get_driver_data(dev);
 	u32 reset_mode = ast_reset_mode_from_flags(flags);
+
+	/* 32 bits at 1MHz is 4294967ms */
+	timeout = min_t(u64, timeout, 4294967);
+
+	/* WDT counts in ticks of 1MHz clock. 1ms / 1e3 * 1e6 */
+	timeout *= 1000;
 
 	clrsetbits_le32(&priv->regs->ctrl,
 			WDT_CTRL_RESET_MASK << WDT_CTRL_RESET_MODE_SHIFT,
@@ -53,6 +56,7 @@ static int ast_wdt_stop(struct udevice *dev)
 
 	clrbits_le32(&priv->regs->ctrl, WDT_CTRL_EN);
 
+	writel(WDT_RESET_DEFAULT, &priv->regs->reset_mask);
 	return 0;
 }
 
@@ -121,5 +125,4 @@ U_BOOT_DRIVER(ast_wdt) = {
 	.priv_auto_alloc_size = sizeof(struct ast_wdt_priv),
 	.ofdata_to_platdata = ast_wdt_ofdata_to_platdata,
 	.ops = &ast_wdt_ops,
-	.flags = DM_FLAG_PRE_RELOC,
 };

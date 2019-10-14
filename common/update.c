@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2008 Semihalf
  *
  * Written by: Rafal Czubak <rcz@semihalf.com>
  *             Bartlomiej Sieka <tur@semihalf.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -18,6 +17,7 @@
 #endif
 
 #include <command.h>
+#include <env.h>
 #include <flash.h>
 #include <net.h>
 #include <net/tftp.h>

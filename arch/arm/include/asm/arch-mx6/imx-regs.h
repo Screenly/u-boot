@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2011 Freescale Semiconductor, Inc. All Rights Reserved.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __ASM_ARCH_MX6_IMX_REGS_H__
@@ -232,7 +231,11 @@
 #define AIPS2_OFF_BASE_ADDR         (ATZ2_BASE_ADDR + 0x80000)
 #define AIPS3_ON_BASE_ADDR          (ATZ3_BASE_ADDR + 0x7C000)
 #define AIPS3_OFF_BASE_ADDR         (ATZ3_BASE_ADDR + 0x80000)
+#if defined(CONFIG_MX6UL)
+#define CAAM_BASE_ADDR              (ATZ2_BASE_ADDR + 0x40000)
+#else
 #define CAAM_BASE_ADDR              (ATZ2_BASE_ADDR)
+#endif
 #define ARM_BASE_ADDR		    (ATZ2_BASE_ADDR + 0x40000)
 
 #define CONFIG_SYS_FSL_SEC_OFFSET   0
@@ -993,5 +996,12 @@ struct pwm_regs {
 	u32	pr;
 	u32	cnr;
 };
+
+/*
+ * If ROM fail back to USB recover mode, USBPH0_PWD will be clear to use USB
+ * If boot from the other mode, USB0_PWD will keep reset value
+ */
+#define	is_boot_from_usb(void) (!(readl(USB_PHY0_BASE_ADDR) & (1<<20)))
+
 #endif /* __ASSEMBLER__*/
 #endif /* __ASM_ARCH_MX6_IMX_REGS_H__ */

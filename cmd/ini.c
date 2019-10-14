@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BSD-3-Clause
 /*
  * inih -- simple .INI file parser
  *
@@ -6,15 +7,13 @@
  *              Joe Hershberger, National Instruments, joe.hershberger@ni.com
  * All rights reserved.
  *
- * SPDX-License-Identifier:	BSD-3-Clause
- *
  * Go to the project home page for more info:
  * http://code.google.com/p/inih/
  */
 
 #include <common.h>
 #include <command.h>
-#include <environment.h>
+#include <env.h>
 #include <linux/ctype.h>
 #include <linux/string.h>
 

@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright 2011-2012 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _ASM_MPC85xx_CONFIG_H_
@@ -62,19 +61,16 @@
 /* P1011 is single core version of P1020 */
 #elif defined(CONFIG_ARCH_P1011)
 #define CONFIG_TSECV2
-#define CONFIG_FSL_PCIE_DISABLE_ASPM
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2
 
 #elif defined(CONFIG_ARCH_P1020)
 #define CONFIG_TSECV2
-#define CONFIG_FSL_PCIE_DISABLE_ASPM
 #ifndef CONFIG_USB_MAX_CONTROLLER_COUNT
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2
 #endif
 
 #elif defined(CONFIG_ARCH_P1021)
 #define CONFIG_TSECV2
-#define CONFIG_FSL_PCIE_DISABLE_ASPM
 #define QE_MURAM_SIZE			0x6000UL
 #define MAX_QE_RISC			1
 #define QE_NUM_OF_SNUM			28
@@ -96,14 +92,12 @@
 /* P1024 is lower end variant of P1020 */
 #elif defined(CONFIG_ARCH_P1024)
 #define CONFIG_TSECV2
-#define CONFIG_FSL_PCIE_DISABLE_ASPM
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2
 
 /* P1025 is lower end variant of P1021 */
 #elif defined(CONFIG_ARCH_P1025)
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	1
 #define CONFIG_TSECV2
-#define CONFIG_FSL_PCIE_DISABLE_ASPM
 #define QE_MURAM_SIZE			0x6000UL
 #define MAX_QE_RISC			1
 #define QE_NUM_OF_SNUM			28

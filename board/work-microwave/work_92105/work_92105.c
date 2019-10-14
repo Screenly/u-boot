@@ -1,10 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * WORK Microwave work_92105 board support
  *
  * (C) Copyright 2014  DENX Software Engineering GmbH
  * Written-by: Albert ARIBAUD <albert.aribaud@3adev.fr>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -53,8 +52,10 @@ int board_early_init_r(void)
 	gpio_request(GPO_19, "NAND_nWP");
 	gpio_direction_output(GPO_19, 1);
 
+#ifdef CONFIG_DEPRECATED
 	/* initialize display */
 	work_92105_display_init();
+#endif
 
 	return 0;
 }

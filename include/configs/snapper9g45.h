@@ -1,11 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Bluewater Systems Snapper 9G45 module
  *
  * (C) Copyright 2011 Bluewater Systems
  *   Author: Andre Renaud <andre@bluewatersys.com>
  *   Author: Ryan Mallon <ryan@bluewatersys.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -26,7 +25,6 @@
 #define CONFIG_SKIP_LOWLEVEL_INIT_ONLY
 
 /* SDRAM */
-#define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_SDRAM_BASE		ATMEL_BASE_CS6
 #define CONFIG_SYS_SDRAM_SIZE		(128 * 1024 * 1024) /* 64MB */
 #define CONFIG_SYS_INIT_SP_ADDR		(ATMEL_BASE_SRAM + 0x1000 - \
@@ -37,8 +35,6 @@
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + (1024 * 1024))
 
 /* NAND Flash */
-#define CONFIG_NAND_ATMEL
-#define CONFIG_ATMEL_NAND_HWECC
 #define CONFIG_SYS_NAND_ECC_BASE	ATMEL_BASE_ECC
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		ATMEL_BASE_CS3
@@ -64,8 +60,6 @@
 #define CONFIG_ATMEL_LCD
 #define CONFIG_GURNARD_SPLASH
 
-#define CONFIG_ATMEL_SPI
-
 /* GPIOs and IO expander */
 #define CONFIG_ATMEL_LEGACY
 #define CONFIG_AT91_GPIO
@@ -80,8 +74,6 @@
 #define CONFIG_BOOTP_BOOTFILESIZE
 
 /* Environment settings */
-#define CONFIG_ENV_OFFSET		(512 << 10)
-#define CONFIG_ENV_SIZE			(256 << 10)
 #define CONFIG_ENV_OVERWRITE
 
 #define	CONFIG_EXTRA_ENV_SETTINGS	\

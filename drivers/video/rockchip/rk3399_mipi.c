@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (c) 2017, Fuzhou Rockchip Electronics Co., Ltd
  * Author: Eric Gao <eric.gao@rock-chips.com>
- *
- * SPDX-License-Identifier: GPL-2.0+
  */
 
 #include <common.h>
@@ -15,16 +14,14 @@
 #include "rk_mipi.h"
 #include <syscon.h>
 #include <asm/gpio.h>
-#include <asm/hardware.h>
 #include <asm/io.h>
 #include <dm/uclass-internal.h>
 #include <linux/kernel.h>
-#include <asm/arch/clock.h>
-#include <asm/arch/cru_rk3399.h>
-#include <asm/arch/grf_rk3399.h>
-#include <asm/arch/rockchip_mipi_dsi.h>
-
-DECLARE_GLOBAL_DATA_PTR;
+#include <asm/arch-rockchip/clock.h>
+#include <asm/arch-rockchip/cru_rk3399.h>
+#include <asm/arch-rockchip/grf_rk3399.h>
+#include <asm/arch-rockchip/hardware.h>
+#include <asm/arch-rockchip/rockchip_mipi_dsi.h>
 
 /* Select mipi dsi source, big or little vop */
 static int rk_mipi_dsi_source_select(struct udevice *dev)
@@ -128,7 +125,7 @@ static int rk_mipi_ofdata_to_platdata(struct udevice *dev)
 	struct rk_mipi_priv *priv = dev_get_priv(dev);
 
 	priv->grf = syscon_get_first_range(ROCKCHIP_SYSCON_GRF);
-	if (priv->grf <= 0) {
+	if (IS_ERR_OR_NULL(priv->grf)) {
 		debug("%s: Get syscon grf failed (ret=%p)\n",
 		      __func__, priv->grf);
 		return  -ENXIO;

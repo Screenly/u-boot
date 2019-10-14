@@ -1,8 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2014 Google, Inc
  * Copyright (C) 2015 Bin Meng <bmeng.cn@gmail.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _ASM_MRCCACHE_H
@@ -103,5 +102,16 @@ int mrccache_get_region(struct udevice **devp, struct mrc_region *entry);
  * @return 0 if saved to SPI flash successfully, other error if failed
  */
 int mrccache_save(void);
+
+/**
+ * mrccache_spl_save() - Save to the MRC region from SPL
+ *
+ * When SPL is used to set up the memory controller we want to save the MRC
+ * data in SPL to avoid needing to pass it up to U-Boot proper to save. This
+ * function handles that.
+ *
+ * @return 0 if saved to SPI flash successfully, other error if failed
+ */
+int mrccache_spl_save(void);
 
 #endif /* _ASM_MRCCACHE_H */

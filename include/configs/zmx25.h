@@ -1,10 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (c) 2011 Graf-Syteco, Matthias Weisser
  * <weisserm@arcor.de>
  *
  * Configuation settings for the zmx25 board
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -40,14 +39,12 @@
  */
 #define CONFIG_MXC_UART
 #define CONFIG_MXC_UART_BASE	UART2_BASE
-#define CONFIG_CONS_INDEX	1	/* use UART2 for console */
 
 /*
  * Ethernet
  */
 #define CONFIG_FEC_MXC
 #define CONFIG_FEC_MXC_PHYADDR		0x00
-#define CONFIG_MII
 
 /*
  * BOOTP options
@@ -75,7 +72,6 @@
 #endif /* CONFIG_CMD_USB */
 
 /* SDRAM */
-#define CONFIG_NR_DRAM_BANKS	1
 #define PHYS_SDRAM		0x80000000	/* start address of LPDDRRAM */
 #define PHYS_SDRAM_SIZE		0x04000000	/* 64 megs */
 
@@ -96,16 +92,11 @@
 /*
  * CFI FLASH driver setup
  */
-#define CONFIG_SYS_FLASH_CFI
-#define CONFIG_FLASH_CFI_DRIVER
-#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE	/* ~10x faster */
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_SDRAM_BASE
 
 #define CONFIG_SYS_MEMTEST_START	(PHYS_SDRAM + (512*1024))
 #define CONFIG_SYS_MEMTEST_END		(PHYS_SDRAM + PHYS_SDRAM_SIZE)
-
-#define CONFIG_PREBOOT  ""
 
 
 /*

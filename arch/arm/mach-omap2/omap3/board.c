@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  *
  * Common board functions for OMAP3 based boards.
@@ -13,8 +14,6 @@
  *      Richard Woodruff <r-woodruff2@ti.com>
  *      Syed Mohammed Khasim <khasim@ti.com>
  *
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 #include <common.h>
 #include <dm.h>
@@ -28,8 +27,6 @@
 #include <asm/omap_common.h>
 #include <linux/compiler.h>
 
-DECLARE_GLOBAL_DATA_PTR;
-
 /* Declarations */
 extern omap3_sysinfo sysinfo;
 #ifndef CONFIG_SYS_L2CACHE_OFF
@@ -37,6 +34,8 @@ static void omap3_invalidate_l2_cache_secure(void);
 #endif
 
 #ifdef CONFIG_DM_GPIO
+#if !CONFIG_IS_ENABLED(OF_CONTROL)
+/* Manually initialize GPIO banks when OF_CONTROL doesn't */
 static const struct omap_gpio_platdata omap34xx_gpio[] = {
 	{ 0, OMAP34XX_GPIO1_BASE },
 	{ 1, OMAP34XX_GPIO2_BASE },
@@ -54,7 +53,7 @@ U_BOOT_DEVICES(omap34xx_gpios) = {
 	{ "gpio_omap", &omap34xx_gpio[4] },
 	{ "gpio_omap", &omap34xx_gpio[5] },
 };
-
+#endif
 #else
 
 static const struct gpio_bank gpio_bank_34xx[6] = {

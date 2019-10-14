@@ -1,12 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2013 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 #include <console.h>
-#include <environment.h>
+#include <env.h>
+#include <env_internal.h>
 #include <ns16550.h>
 #include <malloc.h>
 #include <mmc.h>

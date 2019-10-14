@@ -1,14 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2011-2012 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 /* #define DEBUG */
 
 #include <common.h>
 #include <command.h>
-#include <environment.h>
+#include <env_internal.h>
 #include <linux/stddef.h>
 
 #ifdef ENV_IS_EMBEDDED

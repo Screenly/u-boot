@@ -1,9 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Command for accessing SPI flash.
  *
  * Copyright (C) 2008 Atmel Corporation
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -82,14 +81,13 @@ static int do_spi_flash_probe(int argc, char * const argv[])
 {
 	unsigned int bus = CONFIG_SF_DEFAULT_BUS;
 	unsigned int cs = CONFIG_SF_DEFAULT_CS;
+	/* In DM mode, defaults speed and mode will be taken from DT */
 	unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
 	unsigned int mode = CONFIG_SF_DEFAULT_MODE;
 	char *endp;
 #ifdef CONFIG_DM_SPI_FLASH
 	struct udevice *new, *bus_dev;
 	int ret;
-	/* In DM mode defaults will be taken from DT */
-	speed = 0, mode = 0;
 #else
 	struct spi_flash *new;
 #endif
@@ -287,7 +285,7 @@ static int do_spi_flash_read_write(int argc, char * const argv[])
 	}
 
 	buf = map_physmem(addr, len, MAP_WRBACK);
-	if (!buf) {
+	if (!buf && addr) {
 		puts("Failed to map physical memory\n");
 		return 1;
 	}
@@ -414,7 +412,7 @@ static void show_time(struct test_info *test, int stage)
 		do_div(speed, test->time_ms[stage] * 1024);
 	bps = speed * 8;
 
-	printf("%d %s: %d ticks, %d KiB/s %d.%03d Mbps\n", stage,
+	printf("%d %s: %u ticks, %d KiB/s %d.%03d Mbps\n", stage,
 	       stage_name[stage], test->time_ms[stage],
 	       (int)speed, bps / 1000, bps % 1000);
 }

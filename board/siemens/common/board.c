@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Common board functions for siemens AM335X based boards
  * (C) Copyright 2013 Siemens Schweiz AG
@@ -6,11 +7,10 @@
  * Based on:
  * U-Boot file:/board/ti/am335x/board.c
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
+#include <env.h>
 #include <errno.h>
 #include <spl.h>
 #include <asm/arch/cpu.h>
@@ -189,14 +189,11 @@ void set_env_gpios(unsigned char state)
 {
 	char *ptr_env;
 	char str_tmp[5];	/* must contain "ledX"*/
-	char num[1];
 	unsigned char i, idx, pos1, pos2, ccount;
 	unsigned char gpio_n, gpio_s0, gpio_s1;
 
 	for (i = 0; i < MAX_NR_LEDS; i++) {
-		strcpy(str_tmp, "led");
-		sprintf(num, "%d", i);
-		strcat(str_tmp, num);
+		sprintf(str_tmp, "led%d", i);
 
 		/* If env var is not found we stop */
 		ptr_env = env_get(str_tmp);

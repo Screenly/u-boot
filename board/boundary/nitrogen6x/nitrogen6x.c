@@ -1,11 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2010-2013 Freescale Semiconductor, Inc.
  * Copyright (C) 2013, Boundary Devices <info@boundarydevices.com>
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
+#include <env.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/imx-regs.h>
@@ -22,7 +22,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/video.h>
 #include <mmc.h>
-#include <fsl_esdhc.h>
+#include <fsl_esdhc_imx.h>
 #include <micrel.h>
 #include <miiphy.h>
 #include <netdev.h>
@@ -284,7 +284,7 @@ int board_ehci_power(int port, int on)
 
 #endif
 
-#ifdef CONFIG_FSL_ESDHC
+#ifdef CONFIG_FSL_ESDHC_IMX
 static struct fsl_esdhc_cfg usdhc_cfg[2] = {
 	{USDHC3_BASE_ADDR},
 	{USDHC4_BASE_ADDR},
@@ -382,6 +382,15 @@ int board_eth_init(bd_t *bis)
 	struct phy_device *phydev = NULL;
 	int ret;
 
+	gpio_request(WL12XX_WL_IRQ_GP, "wifi_irq");
+	gpio_request(IMX_GPIO_NR(6, 30), "rgmii_rxc");
+	gpio_request(IMX_GPIO_NR(6, 25), "rgmii_rd0");
+	gpio_request(IMX_GPIO_NR(6, 27), "rgmii_rd1");
+	gpio_request(IMX_GPIO_NR(6, 28), "rgmii_rd2");
+	gpio_request(IMX_GPIO_NR(6, 29), "rgmii_rd3");
+	gpio_request(IMX_GPIO_NR(6, 24), "rgmii_rx_ctl");
+	gpio_request(IMX_GPIO_NR(3, 23), "rgmii_reset_sabrelite");
+	gpio_request(IMX_GPIO_NR(1, 27), "rgmii_reset_nitrogen6x");
 	setup_iomux_enet();
 
 #ifdef CONFIG_FEC_MXC
@@ -912,7 +921,16 @@ int board_init(void)
 
 int checkboard(void)
 {
-	if (gpio_get_value(WL12XX_WL_IRQ_GP))
+	int ret = gpio_get_value(WL12XX_WL_IRQ_GP);
+
+	if (ret < 0) {
+		/* The gpios have not been probed yet. Read it myself */
+		struct gpio_regs *regs = (struct gpio_regs *)GPIO6_BASE_ADDR;
+		int gpio = WL12XX_WL_IRQ_GP & 0x1f;
+
+		ret = (readl(&regs->gpio_psr) >> gpio) & 0x01;
+	}
+	if (ret)
 		puts("Board: Nitrogen6X\n");
 	else
 		puts("Board: SABRE Lite\n");
@@ -1014,6 +1032,16 @@ static const struct boot_mode board_boot_modes[] = {
 
 int misc_init_r(void)
 {
+	gpio_request(RGB_BACKLIGHT_GP, "lvds backlight");
+	gpio_request(LVDS_BACKLIGHT_GP, "lvds backlight");
+	gpio_request(GP_USB_OTG_PWR, "usbotg power");
+	gpio_request(IMX_GPIO_NR(7, 12), "usbh1 hub reset");
+	gpio_request(IMX_GPIO_NR(2, 2), "back");
+	gpio_request(IMX_GPIO_NR(2, 4), "home");
+	gpio_request(IMX_GPIO_NR(2, 1), "menu");
+	gpio_request(IMX_GPIO_NR(2, 3), "search");
+	gpio_request(IMX_GPIO_NR(7, 13), "volup");
+	gpio_request(IMX_GPIO_NR(4, 5), "voldown");
 #ifdef CONFIG_PREBOOT
 	preboot_keys();
 #endif

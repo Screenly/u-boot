@@ -1,7 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2016 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef _ASM_ARCH_SCG_H
@@ -338,5 +337,6 @@ void scg_a7_nicclk_init(void);
 void scg_a7_sys_clk_sel(enum scg_sys_src clk);
 void scg_a7_info(void);
 void scg_a7_soscdiv_init(void);
+void scg_a7_init_core_clk(void);
 
 #endif

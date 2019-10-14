@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * (C) Copyright 2011, Stefano Babic <sbabic@denx.de>
  *
@@ -6,8 +7,6 @@
  * Copyright (C) 2007, Guennadi Liakhovetski <lg@denx.de>
  *
  * Configuration for the flea3 board.
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #ifndef __CONFIG_H
@@ -17,8 +16,6 @@
 
  /* High Level Configuration Options */
 #define CONFIG_MX35
-
-#define CONFIG_SYS_DCACHE_OFF
 
 #define CONFIG_MACH_TYPE		MACH_TYPE_FLEA3
 
@@ -55,7 +52,6 @@
 
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
-#define CONFIG_CONS_INDEX	1
 
 /*
  * Command definition
@@ -72,8 +68,6 @@
 #define CONFIG_FEC_MXC
 #define IMX_FEC_BASE	FEC_BASE_ADDR
 #define CONFIG_FEC_MXC_PHYADDR	0x1
-
-#define CONFIG_MII
 
 #define CONFIG_ARP_TIMEOUT	200UL
 
@@ -93,7 +87,6 @@
 /*
  * Physical Memory Map
  */
-#define CONFIG_NR_DRAM_BANKS	1
 #define PHYS_SDRAM_1		CSD0_BASE_ADDR
 #define PHYS_SDRAM_1_SIZE	(128 * 1024 * 1024)
 
@@ -108,9 +101,6 @@
 /*
  * MTD Command for mtdparts
  */
-#define CONFIG_MTD_DEVICE
-#define CONFIG_FLASH_CFI_MTD
-#define CONFIG_MTD_PARTITIONS
 
 /*
  * FLASH and environment organization
@@ -135,12 +125,8 @@
 /*
  * CFI FLASH driver setup
  */
-#define CONFIG_SYS_FLASH_CFI		/* Flash memory is CFI compliant */
-#define CONFIG_FLASH_CFI_DRIVER
 
 /* A non-standard buffered write algorithm */
-#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE	/* faster */
-#define CONFIG_SYS_FLASH_PROTECTION	/* Use hardware sector protection */
 
 /*
  * NAND FLASH driver setup
@@ -156,7 +142,7 @@
  * to update uboot and load kernel
  */
 
-#define CONFIG_HOSTNAME flea3
+#define CONFIG_HOSTNAME "flea3"
 #define	CONFIG_EXTRA_ENV_SETTINGS					\
 	"netdev=eth0\0"							\
 	"nfsargs=setenv bootargs root=/dev/nfs rw "			\
@@ -174,9 +160,9 @@
 	"addmisc=setenv bootargs ${bootargs} ${misc}\0"			\
 	"loadaddr=80800000\0"						\
 	"kernel_addr_r=80800000\0"					\
-	"hostname=" __stringify(CONFIG_HOSTNAME) "\0"			\
-	"bootfile=" __stringify(CONFIG_HOSTNAME) "/uImage\0"		\
-	"ramdisk_file=" __stringify(CONFIG_HOSTNAME) "/uRamdisk\0"	\
+	"hostname=" CONFIG_HOSTNAME "\0"			\
+	"bootfile=" CONFIG_HOSTNAME "/uImage\0"		\
+	"ramdisk_file=" CONFIG_HOSTNAME "/uRamdisk\0"	\
 	"flash_self=run ramargs addip addtty addmtd addmisc;"		\
 		"bootm ${kernel_addr} ${ramdisk_addr}\0"		\
 	"flash_nfs=run nfsargs addip addtty addmtd addmisc;"		\
@@ -190,7 +176,7 @@
 		"run ramargs addip addtty addmtd addmisc;"		\
 		"bootm ${kernel_addr_r} ${ramdisk_addr_r};"		\
 		"else echo Images not loades;fi\0"			\
-	"u-boot=" __stringify(CONFIG_HOSTNAME) "/u-boot.bin\0"		\
+	"u-boot=" CONFIG_HOSTNAME "/u-boot.bin\0"		\
 	"load=tftp ${loadaddr} ${u-boot}\0"				\
 	"uboot_addr=" __stringify(CONFIG_SYS_MONITOR_BASE) "\0"		\
 	"update=protect off ${uboot_addr} +80000;"			\

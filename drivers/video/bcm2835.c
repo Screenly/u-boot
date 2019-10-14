@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * (C) Copyright 2012 Stephen Warren
- *
- * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -20,13 +19,15 @@ static int bcm2835_video_probe(struct udevice *dev)
 
 	debug("bcm2835: Query resolution...\n");
 	ret = bcm2835_get_video_size(&w, &h);
-	if (ret)
+	if (ret || w == 0 || h == 0)
 		return -EIO;
 
 	debug("bcm2835: Setting up display for %d x %d\n", w, h);
 	ret = bcm2835_set_video_params(&w, &h, 32, BCM2835_MBOX_PIXEL_ORDER_RGB,
 				       BCM2835_MBOX_ALPHA_MODE_IGNORED,
 				       &fb_base, &fb_size, &pitch);
+	if (ret)
+		return -EIO;
 
 	debug("bcm2835: Final resolution is %d x %d\n", w, h);
 
@@ -49,6 +50,7 @@ static int bcm2835_video_probe(struct udevice *dev)
 
 static const struct udevice_id bcm2835_video_ids[] = {
 	{ .compatible = "brcm,bcm2835-hdmi" },
+	{ .compatible = "brcm,bcm2708-fb" },
 	{ }
 };
 

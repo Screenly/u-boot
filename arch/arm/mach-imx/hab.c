@@ -1,12 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2010-2015 Freescale Semiconductor, Inc.
- *
- * SPDX-License-Identifier:    GPL-2.0+
  */
 
 #include <common.h>
 #include <config.h>
 #include <fuse.h>
+#include <mapmem.h>
+#include <image.h>
 #include <asm/io.h>
 #include <asm/system.h>
 #include <asm/arch/clock.h>
@@ -16,7 +17,7 @@
 #define ALIGN_SIZE		0x1000
 #define MX6DQ_PU_IROM_MMU_EN_VAR	0x009024a8
 #define MX6DLS_PU_IROM_MMU_EN_VAR	0x00901dd0
-#define MX6SL_PU_IROM_MMU_EN_VAR	0x00900a18
+#define MX6SL_PU_IROM_MMU_EN_VAR	0x00901c60
 #define IS_HAB_ENABLED_BIT \
 	(is_soc_type(MXC_SOC_MX7ULP) ? 0x80000000 :	\
 	 (is_soc_type(MXC_SOC_MX7) ? 0x2000000 : 0x2))
@@ -303,18 +304,41 @@ static int do_hab_status(cmd_tbl_t *cmdtp, int flag, int argc,
 	return 0;
 }
 
+static ulong get_image_ivt_offset(ulong img_addr)
+{
+	const void *buf;
+
+	buf = map_sysmem(img_addr, 0);
+	switch (genimg_get_format(buf)) {
+#if CONFIG_IS_ENABLED(LEGACY_IMAGE_FORMAT)
+	case IMAGE_FORMAT_LEGACY:
+		return (image_get_image_size((image_header_t *)img_addr)
+			+ 0x1000 - 1)  & ~(0x1000 - 1);
+#endif
+#if IMAGE_ENABLE_FIT
+	case IMAGE_FORMAT_FIT:
+		return (fit_get_size(buf) + 0x1000 - 1)  & ~(0x1000 - 1);
+#endif
+	default:
+		return 0;
+	}
+}
+
 static int do_authenticate_image(cmd_tbl_t *cmdtp, int flag, int argc,
 				 char * const argv[])
 {
 	ulong	addr, length, ivt_offset;
 	int	rcode = 0;
 
-	if (argc < 4)
+	if (argc < 3)
 		return CMD_RET_USAGE;
 
 	addr = simple_strtoul(argv[1], NULL, 16);
 	length = simple_strtoul(argv[2], NULL, 16);
-	ivt_offset = simple_strtoul(argv[3], NULL, 16);
+	if (argc == 3)
+		ivt_offset = get_image_ivt_offset(addr);
+	else
+		ivt_offset = simple_strtoul(argv[3], NULL, 16);
 
 	rcode = imx_hab_authenticate_image(addr, length, ivt_offset);
 	if (rcode == 0)
@@ -341,6 +365,31 @@ static int do_hab_failsafe(cmd_tbl_t *cmdtp, int flag, int argc,
 	return 0;
 }
 
+static int do_authenticate_image_or_failover(cmd_tbl_t *cmdtp, int flag,
+					     int argc, char * const argv[])
+{
+	int ret = CMD_RET_FAILURE;
+
+	if (argc != 4) {
+		ret = CMD_RET_USAGE;
+		goto error;
+	}
+
+	if (!imx_hab_is_enabled()) {
+		printf("error: secure boot disabled\n");
+		goto error;
+	}
+
+	if (do_authenticate_image(NULL, flag, argc, argv) != CMD_RET_SUCCESS) {
+		fprintf(stderr, "authentication fail -> %s %s %s %s\n",
+			argv[0], argv[1], argv[2], argv[3]);
+		do_hab_failsafe(0, 0, 1, NULL);
+	};
+	ret = CMD_RET_SUCCESS;
+error:
+	return ret;
+}
+
 U_BOOT_CMD(
 		hab_status, CONFIG_SYS_MAXARGS, 1, do_hab_status,
 		"display HAB status",
@@ -360,6 +409,16 @@ U_BOOT_CMD(
 		hab_failsafe, CONFIG_SYS_MAXARGS, 1, do_hab_failsafe,
 		"run BootROM failsafe routine",
 		""
+	  );
+
+U_BOOT_CMD(
+		hab_auth_img_or_fail, 4, 0,
+		do_authenticate_image_or_failover,
+		"authenticate image via HAB on failure drop to USB BootROM mode",
+		"addr length ivt_offset\n"
+		"addr - image hex address\n"
+		"length - image hex length\n"
+		"ivt_offset - hex offset of IVT in the image"
 	  );
 
 #endif /* !defined(CONFIG_SPL_BUILD) */
